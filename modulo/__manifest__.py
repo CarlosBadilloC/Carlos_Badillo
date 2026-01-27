@@ -1,13 +1,13 @@
 {
     'name': "modulo",
-    'summary': "Agente IA personalizado con lectura de documentos e integración OpenAI",
+    'summary': "Agente IA personalizado con lectura de documentos e integración Google Gemini",
     'description': """
-Extiende el modelo ai.agent para agregar capacidades de lectura y procesamiento de documentos con OpenAI
+Extiende el modelo ai.agent para agregar capacidades de lectura y procesamiento de documentos con Google Gemini
     """,
     'author': "My Company",
     'website': "https://www.yourcompany.com",
     'category': 'Artificial Intelligence',
-    'version': '0.1',
+    'version': '0.2',
 
     'depends': [
         'base',
@@ -17,7 +17,7 @@ Extiende el modelo ai.agent para agregar capacidades de lectura y procesamiento 
     'data': [
         'views/ai_agent_views.xml',
         'views/ai_agent_menu.xml',
-        'views/openai_config_views.xml',
+        'views/gemini_config_views.xml',
     ],
     
     'demo': [
@@ -25,7 +25,7 @@ Extiende el modelo ai.agent para agregar capacidades de lectura y procesamiento 
     ],
     
     'external_dependencies': {
-        'python': ['PyPDF2', 'openai'],
+        'python': ['google-generativeai', 'PyPDF2'],
     },
     
     'installable': True,

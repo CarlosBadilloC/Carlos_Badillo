@@ -9,7 +9,7 @@
                 <field name="name"/>
                 <field name="active"/>
                 <field name="x_can_read_documents"/>
-                <field name="x_openai_config_id"/>
+                <field name="x_gemini_config_id"/>
             </list>
         </field>
     </record>
@@ -25,7 +25,7 @@
                             string="Leer Documentos" class="btn-primary"
                             invisible="x_can_read_documents == False"/>
                     <button name="action_process_documents_with_llm" type="object"
-                            string="Procesar con OpenAI" class="btn-info"
+                            string="Procesar con Gemini" class="btn-info"
                             invisible="x_document_content == False"/>
                 </header>
                 <sheet>
@@ -33,8 +33,8 @@
                         <field name="name"/>
                         <field name="active"/>
                     </group>
-                    <group string="Configuración OpenAI">
-                        <field name="x_openai_config_id"/>
+                    <group string="Configuración Gemini">
+                        <field name="x_gemini_config_id"/>
                     </group>
                     <group string="Capacidades IA">
                         <field name="x_custom_capability"/>

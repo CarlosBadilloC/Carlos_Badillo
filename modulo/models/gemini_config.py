@@ -1,18 +1,17 @@
 from odoo import models, fields, api # type: ignore
 from odoo.exceptions import ValidationError
 
-class OpenAIConfig(models.Model):
-    _name = 'openai.config'
-    _description = 'OpenAI Configuration'
+class GeminiConfig(models.Model):
+    _name = 'gemini.config'
+    _description = 'Google Gemini Configuration'
 
-    name = fields.Char(string="Nombre", default="OpenAI Config", required=True)
-    api_key = fields.Char(string="API Key", required=True)
+    name = fields.Char(string="Nombre", default="Gemini Config", required=True)
+    api_key = fields.Char(string="API Key de Gemini", required=True)
     model = fields.Selection([
-        ('gpt-4o', 'GPT-4 Optimized'),
-        ('gpt-4-turbo', 'GPT-4 Turbo'),
-        ('gpt-4', 'GPT-4'),
-        ('gpt-3.5-turbo', 'GPT-3.5 Turbo'),
-    ], string="Modelo", default='gpt-4o', required=True)
+        ('gemini-2.0-flash', 'Gemini 2.0 Flash'),
+        ('gemini-1.5-pro', 'Gemini 1.5 Pro'),
+        ('gemini-1.5-flash', 'Gemini 1.5 Flash'),
+    ], string="Modelo", default='gemini-2.0-flash', required=True)
     
     max_tokens = fields.Integer(
         string="Max Tokens",

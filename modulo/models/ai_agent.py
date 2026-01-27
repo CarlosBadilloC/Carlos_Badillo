@@ -1,8 +1,18 @@
 from odoo import models, fields, api # type: ignore
 import base64
-import PyPDF2
 from io import BytesIO
-from openai import OpenAI, APIError
+
+try:
+    import PyPDF2
+    HAS_PYPDF2 = True
+except ImportError:
+    HAS_PYPDF2 = False
+
+try:
+    import google.generativeai as genai
+    HAS_GEMINI = True
+except ImportError:
+    HAS_GEMINI = False
 
 class AIAgent(models.Model):
     _inherit = 'ai.agent'
@@ -28,9 +38,9 @@ class AIAgent(models.Model):
         readonly=True
     )
 
-    x_openai_config_id = fields.Many2one(
-        'openai.config',
-        string="Configuración OpenAI"
+    x_gemini_config_id = fields.Many2one(
+        'gemini.config',
+        string="Configuración Gemini"
     )
 
     x_agent_response = fields.Text(
@@ -40,7 +50,7 @@ class AIAgent(models.Model):
 
     x_agent_prompt = fields.Text(
         string="Prompt Personalizado",
-        help="Instrucciones adicionales para OpenAI"
+        help="Instrucciones adicionales para Gemini"
     )
 
     @api.model
@@ -53,6 +63,10 @@ class AIAgent(models.Model):
     def _read_documents(self):
         """Lee y extrae contenido de documentos"""
         self.ensure_one()
+        
+        if not HAS_PYPDF2:
+            self.x_document_content = "Error: PyPDF2 no está instalado. Instala con: pip install PyPDF2"
+            return
         
         attachments = self.env['ir.attachment'].search([
             ('res_model', '=', 'ai.agent'),
@@ -99,70 +113,80 @@ class AIAgent(models.Model):
             return f"Error extrayendo PDF: {str(e)}"
 
     def action_process_documents_with_llm(self):
-        """Procesa documentos con OpenAI"""
+        """Procesa documentos con Google Gemini"""
         self.ensure_one()
         
         if not self.x_document_content:
             self._read_documents()
         
-        if not self.x_openai_config_id:
-            raise ValueError("Debe configurar una API Key de OpenAI primero")
+        if not self.x_gemini_config_id:
+            raise ValueError("Debe configurar una API Key de Gemini primero")
         
-        response = self._call_openai_api(self.x_document_content)
+        response = self._call_gemini_api(self.x_document_content)
         self.x_agent_response = response
 
-    def _call_openai_api(self, document_content):
-        """Integración con OpenAI API"""
+    def _call_gemini_api(self, document_content):
+        """Integración con Google Gemini API"""
         self.ensure_one()
         
-        if not self.x_openai_config_id:
-            return "Error: No hay configuración de OpenAI"
+        if not HAS_GEMINI:
+            return "Error: google-generativeai no está instalado. Instala con: pip install google-generativeai"
+        
+        if not self.x_gemini_config_id:
+            return "Error: No hay configuración de Gemini"
         
         try:
-            config = self.x_openai_config_id
-            client = OpenAI(api_key=config.api_key)
+            config = self.x_gemini_config_id
+            genai.configure(api_key=config.api_key)
+            
+            # Crear modelo
+            model = genai.GenerativeModel(config.model)
             
             # Construir el prompt
             system_prompt = "Eres un asistente inteligente especializado en análisis de documentos."
             
-            user_prompt = f"""Analiza el siguiente contenido de documento y proporciona un resumen detallado:
+            user_prompt = f"""{system_prompt}
+
+Analiza el siguiente contenido de documento y proporciona un resumen detallado:
 
 {document_content}
 
 {self.x_agent_prompt if self.x_agent_prompt else ''}
 """
             
-            # Llamar a OpenAI
-            response = client.chat.completions.create(
-                model=config.model,
-                messages=[
-                    {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": user_prompt}
-                ],
-                max_tokens=config.max_tokens,
-                temperature=config.temperature
+            # Llamar a Gemini con configuración actualizada
+            response = model.generate_content(
+                user_prompt,
+                generation_config=genai.GenerationConfig(
+                    max_output_tokens=config.max_tokens,
+                    temperature=config.temperature,
+                ),
+                stream=False
             )
             
-            return response.choices[0].message.content
+            return response.text if response.text else "Sin respuesta de Gemini"
             
-        except APIError as e:
-            return f"Error de OpenAI: {str(e)}"
         except Exception as e:
             return f"Error al procesar: {str(e)}"
 
-    def action_ask_openai(self, question):
-        """Realiza una pregunta a OpenAI sobre los documentos"""
+    def action_ask_gemini(self, question):
+        """Realiza una pregunta a Gemini sobre los documentos"""
         self.ensure_one()
+        
+        if not HAS_GEMINI:
+            return "Error: google-generativeai no está instalado"
         
         if not self.x_document_content:
             self._read_documents()
         
-        if not self.x_openai_config_id:
-            return "Error: No hay configuración de OpenAI"
+        if not self.x_gemini_config_id:
+            return "Error: No hay configuración de Gemini"
         
         try:
-            config = self.x_openai_config_id
-            client = OpenAI(api_key=config.api_key)
+            config = self.x_gemini_config_id
+            genai.configure(api_key=config.api_key)
+            
+            model = genai.GenerativeModel(config.model)
             
             prompt = f"""Basándote en el siguiente contenido de documentos, responde la pregunta:
 
@@ -173,16 +197,16 @@ PREGUNTA: {question}
 
 Proporciona una respuesta clara y detallada basada únicamente en la información de los documentos."""
             
-            response = client.chat.completions.create(
-                model=config.model,
-                messages=[
-                    {"role": "user", "content": prompt}
-                ],
-                max_tokens=config.max_tokens,
-                temperature=config.temperature
+            response = model.generate_content(
+                prompt,
+                generation_config=genai.GenerationConfig(
+                    max_output_tokens=config.max_tokens,
+                    temperature=config.temperature,
+                ),
+                stream=False
             )
             
-            return response.choices[0].message.content
+            return response.text if response.text else "Sin respuesta de Gemini"
             
         except Exception as e:
             return f"Error: {str(e)}"

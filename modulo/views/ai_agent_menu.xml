@@ -1,6 +1,6 @@
 <odoo>
     <record id="action_ai_agent_custom" model="ir.actions.act_window">
-        <field name="name">AI Agents (Custom)</field>
+        <field name="name">AI Agents (Gemini)</field>
         <field name="res_model">ai.agent</field>
         <field name="view_mode">list,form</field>
     </record>
