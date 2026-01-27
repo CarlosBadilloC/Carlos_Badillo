@@ -45,7 +45,6 @@
                         <tree>
                             <field name="name"/>
                             <field name="create_date"/>
-                            <field name="file_size"/>
                         </tree>
                     </field>
                     <separator string="Contenido Extraído"/>

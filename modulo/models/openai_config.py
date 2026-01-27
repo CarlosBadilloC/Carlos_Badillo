@@ -1,4 +1,5 @@
 from odoo import models, fields, api # type: ignore
+from odoo.exceptions import ValidationError
 
 class OpenAIConfig(models.Model):
     _name = 'openai.config'
@@ -27,6 +28,20 @@ class OpenAIConfig(models.Model):
     
     active = fields.Boolean(string="Activo", default=True)
 
-    _sql_constraints = [
-        ('api_key_unique', 'unique(api_key)', 'La API Key debe ser única'),
-    ]
+    @api.constrains('api_key')
+    def _check_api_key_unique(self):
+        """Verifica que la API Key sea única"""
+        for record in self:
+            existing = self.search([
+                ('api_key', '=', record.api_key),
+                ('id', '!=', record.id)
+            ])
+            if existing:
+                raise ValidationError('La API Key debe ser única')
+    
+    @api.constrains('temperature')
+    def _check_temperature_range(self):
+        """Verifica que temperature esté entre 0 y 1"""
+        for record in self:
+            if not (0 <= record.temperature <= 1):
+                raise ValidationError('Temperature debe estar entre 0 y 1')
