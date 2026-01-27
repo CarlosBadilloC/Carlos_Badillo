@@ -15,6 +15,7 @@ Extiende el modelo ai.agent para agregar capacidades de lectura y procesamiento 
     ],
 
     'data': [
+        'security/ir.model.access.csv',
         'views/ai_agent_views.xml',
         'views/ai_agent_menu.xml',
         'views/gemini_config_views.xml',
