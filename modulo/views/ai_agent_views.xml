@@ -1,8 +1,8 @@
 <odoo>
 
     <!-- TREE VIEW -->
-    <record id="view_ai_agent_tree_custom" model="ir.ui.view">
-        <field name="name">ai.agent.tree.custom</field>
+    <record id="view_ai_agent_list_custom" model="ir.ui.view">
+        <field name="name">ai.agent.list.custom</field>
         <field name="model">ai.agent</field>
         <field name="arch" type="xml">
             <list>

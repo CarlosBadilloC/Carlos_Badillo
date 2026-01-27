@@ -2,7 +2,7 @@
     <record id="action_ai_agent_custom" model="ir.actions.act_window">
         <field name="name">AI Agents (Custom)</field>
         <field name="res_model">ai.agent</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
     </record>
 
     <menuitem id="menu_ai_root_custom"
