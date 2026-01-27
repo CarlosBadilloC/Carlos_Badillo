@@ -9,25 +9,51 @@
                 <field name="name"/>
                 <field name="active"/>
                 <field name="x_can_read_documents"/>
+                <field name="x_openai_config_id"/>
             </list>
         </field>
     </record>
 
-    <!-- FORM VIEW (nueva, sin heredar) -->
+    <!-- FORM VIEW -->
     <record id="view_ai_agent_form_custom" model="ir.ui.view">
         <field name="name">ai.agent.form.custom</field>
         <field name="model">ai.agent</field>
         <field name="arch" type="xml">
             <form>
+                <header>
+                    <button name="action_run_custom_logic" type="object" 
+                            string="Leer Documentos" class="btn-primary"
+                            attrs="{'invisible': [('x_can_read_documents', '=', False)]}"/>
+                    <button name="action_process_documents_with_llm" type="object"
+                            string="Procesar con OpenAI" class="btn-info"
+                            attrs="{'invisible': [('x_document_content', '=', False)]}"/>
+                </header>
                 <sheet>
                     <group>
                         <field name="name"/>
                         <field name="active"/>
                     </group>
-                    <group string="Extensiones IA Personalizadas">
+                    <group string="Configuración OpenAI">
+                        <field name="x_openai_config_id"/>
+                    </group>
+                    <group string="Capacidades IA">
                         <field name="x_custom_capability"/>
                         <field name="x_can_read_documents"/>
                     </group>
+                    <separator string="Documentos"/>
+                    <field name="x_document_ids" nolabel="1">
+                        <tree>
+                            <field name="name"/>
+                            <field name="create_date"/>
+                            <field name="file_size"/>
+                        </tree>
+                    </field>
+                    <separator string="Contenido Extraído"/>
+                    <field name="x_document_content" nolabel="1"/>
+                    <separator string="Prompt Personalizado"/>
+                    <field name="x_agent_prompt" nolabel="1" placeholder="Instrucciones adicionales..."/>
+                    <separator string="Respuesta de IA"/>
+                    <field name="x_agent_response" nolabel="1"/>
                 </sheet>
             </form>
         </field>

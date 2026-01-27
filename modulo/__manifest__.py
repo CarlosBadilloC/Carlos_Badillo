@@ -1,38 +1,33 @@
 {
     'name': "modulo",
-
-    'summary': "Short (1 phrase/line) summary of the module's purpose",
-
+    'summary': "Agente IA personalizado con lectura de documentos e integración OpenAI",
     'description': """
-Long description of module's purpose
+Extiende el modelo ai.agent para agregar capacidades de lectura y procesamiento de documentos con OpenAI
     """,
-
     'author': "My Company",
     'website': "https://www.yourcompany.com",
-
-    # Categories can be used to filter modules in modules listing
-    # Check https://github.com/odoo/odoo/blob/15.0/odoo/addons/base/data/ir_module_category_data.xml
-    # for the full list
-    'category': 'Uncategorized',
+    'category': 'Artificial Intelligence',
     'version': '0.1',
 
-    # any module necessary for this one to work correctly
     'depends': [
         'base',
         'ai_app',
-        ],
+    ],
 
-    # always loaded
     'data': [
-        #'security/ir.model.access.csv',
         'views/ai_agent_views.xml',
         'views/ai_agent_menu.xml',
+        'views/openai_config_views.xml',
     ],
-    # only loaded in demonstration mode
+    
     'demo': [
         'demo/demo.xml',
     ],
+    
+    'external_dependencies': {
+        'python': ['PyPDF2', 'openai'],
+    },
+    
     'installable': True,
     'license': 'LGPL-3',
 }
-
