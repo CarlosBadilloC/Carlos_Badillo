@@ -1,0 +1,16 @@
+<odoo>
+    <record id="action_ai_agent_custom" model="ir.actions.act_window">
+        <field name="name">AI Agents (Custom)</field>
+        <field name="res_model">ai.agent</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="menu_ai_root_custom"
+              name="AI Custom"
+              parent="base.menu_custom"/>
+
+    <menuitem id="menu_ai_agent_custom"
+              name="Agents"
+              parent="menu_ai_root_custom"
+              action="action_ai_agent_custom"/>
+</odoo>

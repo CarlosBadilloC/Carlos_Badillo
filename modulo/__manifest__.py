@@ -26,6 +26,7 @@ Long description of module's purpose
     'data': [
         # 'security/ir.model.access.csv',
         'views/ai_agent_views.xml',
+        'views/ai_agent_menu.xml',
     ],
     # only loaded in demonstration mode
     'demo': [

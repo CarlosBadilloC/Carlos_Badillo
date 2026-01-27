@@ -1,21 +1,17 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-
-    <record id="view_ai_agent_form_inherit_custom" model="ir.ui.view">
-        <field name="name">ai.agent.form.inherit.custom</field>
+    <record id="view_ai_agent_form_custom" model="ir.ui.view">
+        <field name="name">ai.agent.form.custom</field>
         <field name="model">ai.agent</field>
-        <field name="inherit_id" ref="ai_app.ai_agent_form"/>
         <field name="arch" type="xml">
-
-            <!-- Insertamos nuestros campos dentro del formulario -->
-            <xpath expr="//sheet" position="inside">
-                <group string="Extensiones IA Personalizadas">
-                    <field name="x_custom_capability"/>
-                    <field name="x_can_read_documents"/>
-                </group>
-            </xpath>
-
+            <form string="AI Agent">
+                <sheet>
+                    <group string="Extensiones IA">
+                        <field name="name"/>
+                        <field name="x_custom_capability"/>
+                        <field name="x_can_read_documents"/>
+                    </group>
+                </sheet>
+            </form>
         </field>
     </record>
-
 </odoo>
