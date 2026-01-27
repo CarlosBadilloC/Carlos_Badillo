@@ -24,7 +24,7 @@ Long description of module's purpose
 
     # always loaded
     'data': [
-        # 'security/ir.model.access.csv',
+        'security/ir.model.access.csv',
         'views/ai_agent_views.xml',
         'views/ai_agent_menu.xml',
     ],
