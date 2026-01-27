@@ -35,17 +35,18 @@
         </field>
     </record>
 
-    <!-- ACTION -->
+    <!-- COMENTADO: Ya está definido en ai_agent_menu.xml -->
+    <!--
     <record id="action_gemini_config" model="ir.actions.act_window">
         <field name="name">Configuración Gemini</field>
         <field name="res_model">gemini.config</field>
         <field name="view_mode">list,form</field>
     </record>
 
-    <!-- MENU -->
     <menuitem id="menu_gemini_config"
               name="Configuración Gemini"
               parent="menu_ai_root_custom"
               action="action_gemini_config"/>
+    -->
 
 </odoo>

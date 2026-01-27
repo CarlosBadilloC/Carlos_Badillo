@@ -7,10 +7,24 @@
 
     <menuitem id="menu_ai_root_custom"
               name="AI Custom"
-               sequence="10"/>
+              sequence="10"/>
 
     <menuitem id="menu_ai_agent_custom"
               name="Agents"
               parent="menu_ai_root_custom"
               action="action_ai_agent_custom"/>
+
+    <!-- NUEVO: Acción para Gemini Config -->
+    <record id="action_gemini_config" model="ir.actions.act_window">
+        <field name="name">Configuración Gemini</field>
+        <field name="res_model">gemini.config</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- NUEVO: Menú para Gemini Config -->
+    <menuitem id="menu_gemini_config"
+              name="Configuración Gemini"
+              parent="menu_ai_root_custom"
+              action="action_gemini_config"
+              sequence="20"/>
 </odoo>
