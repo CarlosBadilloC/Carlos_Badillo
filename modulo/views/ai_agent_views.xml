@@ -23,10 +23,10 @@
                 <header>
                     <button name="action_run_custom_logic" type="object" 
                             string="Leer Documentos" class="btn-primary"
-                            attrs="{'invisible': [('x_can_read_documents', '=', False)]}"/>
+                            invisible="x_can_read_documents == False"/>
                     <button name="action_process_documents_with_llm" type="object"
                             string="Procesar con OpenAI" class="btn-info"
-                            attrs="{'invisible': [('x_document_content', '=', False)]}"/>
+                            invisible="x_document_content == False"/>
                 </header>
                 <sheet>
                     <group>
