@@ -1,13 +1,12 @@
 <odoo>
 
-    <!-- TREE VIEW -->
+    <!-- LIST VIEW -->
     <record id="view_ai_agent_list_custom" model="ir.ui.view">
         <field name="name">ai.agent.list.custom</field>
         <field name="model">ai.agent</field>
         <field name="arch" type="xml">
             <list>
                 <field name="name"/>
-                <field name="model_provider"/>
                 <field name="active"/>
                 <field name="x_can_read_documents"/>
             </list>
