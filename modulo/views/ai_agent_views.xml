@@ -5,12 +5,12 @@
         <field name="name">ai.agent.tree.custom</field>
         <field name="model">ai.agent</field>
         <field name="arch" type="xml">
-            <tree>
+            <list>
                 <field name="name"/>
                 <field name="model_provider"/>
                 <field name="active"/>
                 <field name="x_can_read_documents"/>
-            </tree>
+            </list>
         </field>
     </record>
 

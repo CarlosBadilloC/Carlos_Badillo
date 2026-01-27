@@ -33,6 +33,6 @@ Long description of module's purpose
         'demo/demo.xml',
     ],
     'installable': True,
-    
+    'license': 'LGPL-3',
 }
 
