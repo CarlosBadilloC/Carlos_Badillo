@@ -27,9 +27,8 @@ class AIAgent(models.Model):
     )
 
     x_document_ids = fields.One2many(
-        'ir.attachment',
-        'res_id',
-        domain=[('res_model', '=', 'ai.agent')],
+        'agent.document',
+        'agent_id',
         string="Documentos Adjuntos"
     )
 
@@ -58,6 +57,7 @@ class AIAgent(models.Model):
         """Se ejecuta cuando cambia el checkbox"""
         if self.x_can_read_documents and not self.x_document_content:
             self._read_documents()
+
     def action_run_custom_logic(self):
         """Ejecuta lógica personalizada del agente"""
         for agent in self:
@@ -72,38 +72,33 @@ class AIAgent(models.Model):
             self.x_document_content = "Error: PyPDF2 no está instalado. Instala con: pip install PyPDF2"
             return
         
-        attachments = self.env['ir.attachment'].search([
-            ('res_model', '=', 'ai.agent'),
-            ('res_id', '=', self.id)
-        ])
-
         extracted_content = []
         
-        for attachment in attachments:
-            content = self._extract_document_content(attachment)
+        for doc in self.x_document_ids:
+            content = self._extract_document_content(doc)
             if content:
-                extracted_content.append(f"--- {attachment.name} ---\n{content}\n")
+                extracted_content.append(f"--- {doc.name} ---\n{content}\n")
 
         self.x_document_content = "\n".join(extracted_content)
 
-    def _extract_document_content(self, attachment):
+    def _extract_document_content(self, document):
         """Extrae contenido según el tipo de archivo"""
         try:
-            if attachment.mimetype == 'application/pdf':
-                return self._extract_pdf_content(attachment)
-            elif attachment.mimetype in ['text/plain', 'text/csv']:
-                return base64.b64decode(attachment.datas).decode('utf-8')
-            elif 'text' in attachment.mimetype:
-                return base64.b64decode(attachment.datas).decode('utf-8')
+            file_type = document.file_type or ''
+            
+            if 'pdf' in file_type.lower():
+                return self._extract_pdf_content(document.document_file)
+            elif 'text' in file_type.lower() or 'csv' in file_type.lower():
+                return base64.b64decode(document.document_file).decode('utf-8')
             else:
-                return f"[Tipo de archivo no soportado: {attachment.mimetype}]"
+                return f"[Tipo de archivo no soportado: {file_type}]"
         except Exception as e:
             return f"[Error al leer archivo: {str(e)}]"
 
-    def _extract_pdf_content(self, attachment):
+    def _extract_pdf_content(self, file_data):
         """Extrae texto de un PDF"""
         try:
-            pdf_data = base64.b64decode(attachment.datas)
+            pdf_data = base64.b64decode(file_data)
             pdf_file = BytesIO(pdf_data)
             pdf_reader = PyPDF2.PdfReader(pdf_file)
             
@@ -143,10 +138,8 @@ class AIAgent(models.Model):
             config = self.x_gemini_config_id
             genai.configure(api_key=config.api_key)
             
-            # Crear modelo
             model = genai.GenerativeModel(config.model)
             
-            # Construir el prompt
             system_prompt = "Eres un asistente inteligente especializado en análisis de documentos."
             
             user_prompt = f"""{system_prompt}
@@ -158,7 +151,6 @@ Analiza el siguiente contenido de documento y proporciona un resumen detallado:
 {self.x_agent_prompt if self.x_agent_prompt else ''}
 """
             
-            # Llamar a Gemini con configuración actualizada
             response = model.generate_content(
                 user_prompt,
                 generation_config=genai.GenerationConfig(
