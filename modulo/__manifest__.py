@@ -1,37 +1,43 @@
 {
-    'name': "modulo",
+    'name': "AI Query Handler",
 
-    'summary': "Short (1 phrase/line) summary of the module's purpose",
+    'summary': "Módulo para consultas de IA sobre CRM e Inventario",
 
     'description': """
-Long description of module's purpose
+        Proporciona métodos ORM reutilizables para que AI Agents consulten:
+        - Información de inventario (productos, stock)
+        - Métricas de CRM (oportunidades, leads, pipeline)
+        
+        Compatible con Odoo 19 AI Framework y JSON-RPC.
     """,
 
-    'author': "My Company",
-    'website': "https://www.yourcompany.com",
+    'author': "Carlos Badillo",
 
-    # Categories can be used to filter modules in modules listing
-    # Check https://github.com/odoo/odoo/blob/15.0/odoo/addons/base/data/ir_module_category_data.xml
-    # for the full list
-    'category': 'Uncategorized',
-    'version': '0.1',
+    'category': 'Tools',
+    'version': '1.0.0',
 
-    # any module necessary for this one to work correctly
-    'depends': ['base', "stock", "product"],
-    
-    "application": False,
-
-    # always loaded
-    'data': [
-        # 'security/ir.model.access.csv',
-        'views/views.xml',
-        'views/templates.xml',
+    # Dependencias necesarias
+    'depends': [
+        'base',
+        'product',
+        'stock',
+        'crm',  # Nueva dependencia para CRM
     ],
-    # only loaded in demonstration mode
+    
+    'application': False,
+    'installable': True,
+    'auto_install': False,
+
+    # Datos cargados
+    'data': [
+        'security/ir.model.access.csv',
+        # 'views/views.xml',  # Comentado: no usamos vistas por ahora
+        # 'views/templates.xml',  # Comentado: no usamos templates por ahora
+    ],
+    
     'demo': [
-        'demo/demo.xml',
+        # 'demo/demo.xml',  # Comentado: no necesitamos datos demo
     ],
     
     'license': 'LGPL-3',
 }
-
