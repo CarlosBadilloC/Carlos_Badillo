@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Test Action para Inventario -->
+        <record id="action_test_inventory" model="ir.actions.server">
+            <field name="name">Test: Inventory Summary</field>
+            <field name="model_id" ref="base.model_ir_ui_menu"/>
+            <field name="state">code</field>
+            <field name="code">
+result = env['ai.query.handler'].get_inventory_summary()
+            </field>
+        </record>
+
+        <!-- Test Action para CRM -->
+        <record id="action_test_crm" model="ir.actions.server">
+            <field name="name">Test: CRM Summary</field>
+            <field name="model_id" ref="base.model_ir_ui_menu"/>
+            <field name="state">code</field>
+            <field name="code">
+result = env['ai.query.handler'].get_crm_summary()
+            </field>
+        </record>
+
+        <!-- Test Tools Registry -->
+        <record id="action_test_tools" model="ir.actions.server">
+            <field name="name">Test: Available Tools</field>
+            <field name="model_id" ref="base.model_ir_ui_menu"/>
+            <field name="state">code</field>
+            <field name="code">
+result = env['ai.tools.registry'].get_available_tools()
+            </field>
+        </record>
+    </data>
+</odoo>

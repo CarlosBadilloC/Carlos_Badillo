@@ -38,6 +38,7 @@
     'data': [
         'security/ir.model.access.csv',
         'data/ai_prompts.xml',
+        'views/test_views.xml',
     ],
     
     'demo': [],
