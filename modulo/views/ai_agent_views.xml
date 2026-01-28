@@ -36,6 +36,7 @@
                     <field name="x_document_ids" nolabel="1" widget="one2many_list">
                         <list editable="bottom">
                             <field name="name"/>
+                            <field name="document_file" filename="file_name" widget="binary"/>
                             <field name="file_name"/>
                             <field name="file_type"/>
                             <field name="create_date"/>
