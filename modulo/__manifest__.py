@@ -9,6 +9,12 @@
         - Métricas de CRM (oportunidades, leads, pipeline)
         
         Compatible con Odoo 19 AI Framework y JSON-RPC.
+        
+        Features:
+        - 5 tools consumibles por AI Agents
+        - Endpoints JSON-RPC para integración externa
+        - Prompts del sistema para guiar comportamiento del agente
+        - Respuestas estructuradas y fáciles de parsear
     """,
 
     'author': "Carlos Badillo",
@@ -21,23 +27,20 @@
         'base',
         'product',
         'stock',
-        'crm',  # Nueva dependencia para CRM
+        'crm',
     ],
     
     'application': False,
     'installable': True,
     'auto_install': False,
 
-    # Datos cargados
+    # Datos cargados durante la instalación
     'data': [
         'security/ir.model.access.csv',
-        # 'views/views.xml',  # Comentado: no usamos vistas por ahora
-        # 'views/templates.xml',  # Comentado: no usamos templates por ahora
+        'data/ai_prompts.xml',
     ],
     
-    'demo': [
-        # 'demo/demo.xml',  # Comentado: no necesitamos datos demo
-    ],
+    'demo': [],
     
     'license': 'LGPL-3',
 }
