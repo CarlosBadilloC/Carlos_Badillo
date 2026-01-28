@@ -34,10 +34,19 @@
                     
                     <separator string="Documentos Adjuntos"/>
                     <field name="x_document_ids" nolabel="1">
-                        <tree editable="bottom">
-                            <field name="name"/>
-                            <field name="create_date"/>
-                        </tree>
+                        <kanban>
+                            <templates>
+                                <t t-name="kanban-box">
+                                    <div class="oe_kanban_global_click">
+                                        <div class="o_kanban_record_body">
+                                            <strong><field name="name"/></strong>
+                                            <br/>
+                                            <small>Creado: <field name="create_date"/></small>
+                                        </div>
+                                    </div>
+                                </t>
+                            </templates>
+                        </kanban>
                     </field>
                     
                     <separator string="Contenido Extraído"/>
