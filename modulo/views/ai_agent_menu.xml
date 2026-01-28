@@ -7,7 +7,7 @@
     </record>
 
     <menuitem id="menu_ai_root_custom"
-              name="AI Custom"
+              name="Agente IA"
               sequence="10"/>
 
     <menuitem id="menu_ai_agent_custom"
