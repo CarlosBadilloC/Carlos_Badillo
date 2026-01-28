@@ -231,14 +231,3 @@ class AIQueryHandler(models.AbstractModel):
                 'message': str(e)
             }
             
-# Probar inventario
-result = env['ai.query.handler'].get_product_count()
-print(result)
-
-# Probar CRM
-result = env['ai.query.handler'].get_crm_summary()
-print(result)
-
-# Probar pipeline
-result = env['ai.query.handler'].get_opportunities_by_stage()
-print(result)
