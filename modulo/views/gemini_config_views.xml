@@ -22,18 +22,18 @@
         </field>
     </record>
 
-    <!-- LIST VIEW FOR GEMINI CONFIG -->
+    <!-- LIST VIEW FOR GEMINI CONFIG - CAMBIAR <tree> a <list> -->
     <record id="view_gemini_config_list" model="ir.ui.view">
         <field name="name">gemini.config.list</field>
         <field name="model">gemini.config</field>
         <field name="arch" type="xml">
-            <tree>
+            <list>
                 <field name="name"/>
                 <field name="model"/>
                 <field name="max_tokens"/>
                 <field name="temperature"/>
                 <field name="active"/>
-            </tree>
+            </list>
         </field>
     </record>
 
