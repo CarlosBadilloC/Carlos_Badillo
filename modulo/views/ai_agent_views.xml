@@ -1,9 +1,10 @@
 <odoo>
 
-    <!-- FORM VIEW - STANDALONE (NOT INHERITED) -->
+    <!-- FORM VIEW - CON PRIORITY ALTA PARA SOBRESCRIBIR -->
     <record id="view_ai_agent_form_custom" model="ir.ui.view">
         <field name="name">ai.agent.form.custom</field>
         <field name="model">ai.agent</field>
+        <field name="priority">20</field>
         <field name="arch" type="xml">
             <form>
                 <header>
@@ -16,42 +17,47 @@
                 </header>
                 
                 <sheet>
-                    <group>
-                        <field name="name"/>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Nombre del Agente"/>
+                        </h1>
+                    </div>
+                    
+                    <group string="Información Básica">
                         <field name="x_gemini_config_id"/>
+                        <field name="x_custom_capability"/>
                     </group>
                     
-                    <separator string="Capacidades IA"/>
-                    <group>
-                        <field name="x_custom_capability"/>
+                    <group string="Capacidades">
                         <field name="x_can_read_documents"/>
                     </group>
                     
                     <separator string="Documentos Adjuntos"/>
                     <field name="x_document_ids" nolabel="1">
-                        <tree>
+                        <tree editable="bottom">
                             <field name="name"/>
                             <field name="create_date"/>
                         </tree>
                     </field>
                     
                     <separator string="Contenido Extraído"/>
-                    <field name="x_document_content" nolabel="1"/>
+                    <field name="x_document_content" nolabel="1" widget="text"/>
                     
                     <separator string="Prompt Personalizado"/>
                     <field name="x_agent_prompt" nolabel="1" placeholder="Instrucciones adicionales..."/>
                     
                     <separator string="Respuesta de IA"/>
-                    <field name="x_agent_response" nolabel="1"/>
+                    <field name="x_agent_response" nolabel="1" widget="text"/>
                 </sheet>
             </form>
         </field>
     </record>
 
-    <!-- LIST VIEW - CAMBIAR <tree> a <list> -->
+    <!-- LIST VIEW -->
     <record id="view_ai_agent_list_custom" model="ir.ui.view">
         <field name="name">ai.agent.list.custom</field>
         <field name="model">ai.agent</field>
+        <field name="priority">20</field>
         <field name="arch" type="xml">
             <list>
                 <field name="name"/>
