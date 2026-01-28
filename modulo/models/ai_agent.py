@@ -53,7 +53,11 @@ class AIAgent(models.Model):
         help="Instrucciones adicionales para Gemini"
     )
 
-    @api.model
+    @api.onchange('x_can_read_documents')
+    def _onchange_can_read_documents(self):
+        """Se ejecuta cuando cambia el checkbox"""
+        if self.x_can_read_documents and not self.x_document_content:
+            self._read_documents()
     def action_run_custom_logic(self):
         """Ejecuta lógica personalizada del agente"""
         for agent in self:
