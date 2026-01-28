@@ -3,7 +3,7 @@
         <field name="name">AI Agents (Gemini)</field>
         <field name="res_model">ai.agent</field>
         <field name="view_mode">list,form</field>
-        <field name="view_ids" eval="[(5, 0, 0), (0, 0, {'res_id': ref('view_ai_agent_list_custom'), 'view_mode': 'list'}), (0, 0, {'res_id': ref('view_ai_agent_form_custom'), 'view_mode': 'form'})]"/>
+        <field name="view_ids" eval="[(5, 0, 0), (0, 0, {'view_id': ref('view_ai_agent_list_custom'), 'view_mode': 'list'}), (0, 0, {'view_id': ref('view_ai_agent_form_custom'), 'view_mode': 'form'})]"/>
     </record>
 
     <menuitem id="menu_ai_root_custom"
