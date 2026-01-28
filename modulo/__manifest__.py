@@ -18,6 +18,9 @@
     """,
 
     'author': "Carlos Badillo",
+    'models': [
+        'models/crm_inventory_metrics.py',  # Añadir esta línea
+    ],
 
     'category': 'Tools',
     'version': '1.0.0',
