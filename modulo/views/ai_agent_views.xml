@@ -1,60 +1,63 @@
 <odoo>
 
-    <!-- LIST VIEW -->
-    <record id="view_ai_agent_list_custom" model="ir.ui.view">
-        <field name="name">ai.agent.list.custom</field>
-        <field name="model">ai.agent</field>
-        <field name="arch" type="xml">
-            <list>
-                <field name="name"/>
-                <field name="active"/>
-                <field name="x_can_read_documents"/>
-                <field name="x_gemini_config_id"/>
-            </list>
-        </field>
-    </record>
-
-    <!-- FORM VIEW -->
+    <!-- FORM VIEW - HEREDAR Y EXTENDER -->
     <record id="view_ai_agent_form_custom" model="ir.ui.view">
         <field name="name">ai.agent.form.custom</field>
         <field name="model">ai.agent</field>
+        <field name="inherit_id" ref="ai_app.view_ai_agent_form"/>
         <field name="arch" type="xml">
-            <form>
-                <header>
-                    <button name="action_run_custom_logic" type="object" 
-                            string="Leer Documentos" class="btn-primary"
-                            invisible="x_can_read_documents == False"/>
-                    <button name="action_process_documents_with_llm" type="object"
-                            string="Procesar con Gemini" class="btn-info"
-                            invisible="x_document_content == False"/>
-                </header>
-                <sheet>
-                    <group>
+            <xpath expr="//sheet" position="inside">
+                <separator string="Configuración Gemini"/>
+                <group>
+                    <field name="x_gemini_config_id"/>
+                </group>
+                
+                <separator string="Capacidades IA"/>
+                <group>
+                    <field name="x_custom_capability"/>
+                    <field name="x_can_read_documents"/>
+                </group>
+                
+                <separator string="Documentos Adjuntos"/>
+                <field name="x_document_ids" nolabel="1">
+                    <tree>
                         <field name="name"/>
-                        <field name="active"/>
-                    </group>
-                    <group string="Configuración Gemini">
-                        <field name="x_gemini_config_id"/>
-                    </group>
-                    <group string="Capacidades IA">
-                        <field name="x_custom_capability"/>
-                        <field name="x_can_read_documents"/>
-                    </group>
-                    <separator string="Documentos"/>
-                    <field name="x_document_ids" nolabel="1">
-                        <tree>
-                            <field name="name"/>
-                            <field name="create_date"/>
-                        </tree>
-                    </field>
-                    <separator string="Contenido Extraído"/>
-                    <field name="x_document_content" nolabel="1"/>
-                    <separator string="Prompt Personalizado"/>
-                    <field name="x_agent_prompt" nolabel="1" placeholder="Instrucciones adicionales..."/>
-                    <separator string="Respuesta de IA"/>
-                    <field name="x_agent_response" nolabel="1"/>
-                </sheet>
-            </form>
+                        <field name="create_date"/>
+                    </tree>
+                </field>
+                
+                <separator string="Contenido Extraído"/>
+                <field name="x_document_content" nolabel="1"/>
+                
+                <separator string="Prompt Personalizado"/>
+                <field name="x_agent_prompt" nolabel="1" placeholder="Instrucciones adicionales..."/>
+                
+                <separator string="Respuesta de IA"/>
+                <field name="x_agent_response" nolabel="1"/>
+            </xpath>
+            
+            <!-- AGREGAR BOTONES EN HEADER -->
+            <xpath expr="//header" position="inside">
+                <button name="action_run_custom_logic" type="object" 
+                        string="Leer Documentos" class="btn-primary"
+                        invisible="not x_can_read_documents"/>
+                <button name="action_process_documents_with_llm" type="object"
+                        string="Procesar con Gemini" class="btn-info"
+                        invisible="not x_document_content"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- LIST VIEW - HEREDAR Y EXTENDER -->
+    <record id="view_ai_agent_list_custom" model="ir.ui.view">
+        <field name="name">ai.agent.list.custom</field>
+        <field name="model">ai.agent</field>
+        <field name="inherit_id" ref="ai_app.view_ai_agent_list"/>
+        <field name="arch" type="xml">
+            <xpath expr="//tree" position="inside">
+                <field name="x_can_read_documents"/>
+                <field name="x_gemini_config_id"/>
+            </xpath>
         </field>
     </record>
 
