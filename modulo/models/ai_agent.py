@@ -3,6 +3,7 @@ import logging
 import requests
 import traceback
 import google.generativeai as genai
+import json 
 
 _logger = logging.getLogger(__name__)
 
@@ -29,76 +30,65 @@ class DiscussChannel(models.Model):
         
         return message
     
-    def _process_ai_message(self, user_message):
-        """Procesa el mensaje del usuario con el agente IA"""
-        api_key = self.env['ir.config_parameter'].sudo().get_param('modulo.ai_api_key')
-        
-        if not api_key:
-            return "⚠️ No se ha configurado la API Key. Ve a Configuración > Técnico > Parámetros del sistema"
-        
-        # Configurar Gemini
-        genai.configure(api_key=api_key)
-        model = genai.GenerativeModel('gemini-pro')
-        
-        # Definir herramientas disponibles
-        tools = [
-            {
-                "name": "get_odoo_stock",
-                "description": "Busca productos en el inventario de Odoo por nombre",
-                "parameters": {
-                    "type": "object",
-                    "properties": {
-                        "product_name": {
-                            "type": "string",
-                            "description": "Nombre del producto a buscar"
-                        }
-                    },
-                    "required": ["product_name"]
-                }
-            }
-        ]
-        
-        # Crear prompt con contexto
-        prompt = f"""Eres un asistente de IA para un sistema Odoo. 
-Puedes ayudar a consultar información de inventario.
+def _process_ai_message(self, user_message):
+    api_key = self.env['ir.config_parameter'].sudo().get_param('modulo.ai_api_key')
 
-Herramientas disponibles:
-- get_odoo_stock: Busca productos en el inventario
+    if not api_key:
+        return "⚠️ No se ha configurado la API Key."
 
-Pregunta del usuario: {user_message}
+    # Configurar Gemini
+    genai.configure(api_key=api_key)
+    model = genai.GenerativeModel('gemini-pro')
+
+    # PROMPT ESTRICTO
+    prompt = f"""
+Eres un agente IA para Odoo.
+
+Responde SOLO en JSON válido.
+No escribas texto fuera del JSON.
+
+Acciones disponibles:
+- get_stock (requiere product_name)
+- none
+
+Ejemplo:
+{{
+  "action": "get_stock",
+  "product_name": "Laptop"
+}}
+
+Pregunta del usuario:
+{user_message}
 """
-        
+
         # Generar respuesta
-        response = model.generate_content(prompt)
+    response = model.generate_content(prompt)
         
         # Si la IA necesita buscar stock, ejecutar la función
-        if 'stock' in user_message.lower() or 'inventario' in user_message.lower() or 'producto' in user_message.lower():
+    if 'stock' in user_message.lower() or 'inventario' in user_message.lower() or 'producto' in user_message.lower():
             # Extraer nombre del producto del mensaje
             stock_info = self._get_odoo_stock(user_message)
             return f"{response.text}\n\n📦 **Información de Inventario:**\n{stock_info}"
         
-        return response.text
+    return response.text
     
-    def _get_odoo_stock(self, product_name: str) -> str:
-        """Busca productos en el inventario interno de Odoo"""
-        # Limpiar el mensaje para obtener el nombre del producto
-        search_term = product_name.replace('stock', '').replace('inventario', '').replace('producto', '').strip()
-        
-        products = self.env['product.product'].sudo().search([
-            ('name', 'ilike', search_term)
-        ], limit=5)
-        
-        if not products:
-            return "❌ No se encontraron productos que coincidan con la búsqueda"
-        
-        info = []
-        for p in products:
-            stock_info = f"- **{p.name}**: {p.qty_available} uds disponibles"
-            if p.list_price:
-                stock_info += f" | Precio: ${p.list_price:.2f}"
-            info.append(stock_info)
-        
-        return "\n".join(info)
+def _get_odoo_stock(self, product_name):
+    products = self.env['product.product'].sudo().search([
+        ('name', 'ilike', product_name)
+    ], limit=5)
+
+    if not products:
+        return f"❌ No encontré productos llamados '{product_name}'."
+
+    lines = []
+    for p in products:
+        lines.append(
+            f"📦 **{p.name}**\n"
+            f"   Stock: {p.qty_available} uds\n"
+            f"   Precio: ${p.list_price:.2f}"
+        )
+
+    return "\n\n".join(lines)
 
 
 class AIAgentConfig(models.TransientModel):
