@@ -2,20 +2,61 @@ from odoo import models, api
 
 class AIQueryHandler(models.AbstractModel):
     _name = 'ai.query.handler'
-    _description = 'AI Query Handler - Inventory & CRM Queries'
+    _description = 'AI Query Handler - Inventory & CRM (Corrected)'
+
+    # ================= INVENTARIO =================
+
+    @api.model
+    def get_inventory_summary(self):
+        """
+        Retorna un resumen correcto del inventario usando qty_available.
+        """
+        try:
+            Product = self.env['product.product']
+
+            products = Product.search([
+                ('type', '=', 'product'),
+                ('active', '=', True)
+            ])
+
+            total_products = len(products)
+            total_stock_quantity = sum(products.mapped('qty_available'))
+
+            low_stock_products = []
+            for p in products:
+                if 0 < p.qty_available <= 5:
+                    low_stock_products.append({
+                        'id': p.id,
+                        'name': p.display_name,
+                        'qty_available': p.qty_available,
+                        'uom': p.uom_id.name,
+                    })
+
+            return {
+                'total_products': total_products,
+                'total_stock_quantity': total_stock_quantity,
+                'low_stock_products': low_stock_products[:10],
+                'status': 'success'
+            }
+
+        except Exception as e:
+            return {
+                'status': 'error',
+                'message': str(e)
+            }
 
     @api.model
     def get_product_count(self):
         """
-        Retorna el total de productos almacenables en el sistema.
+        Retorna el total de productos almacenables activos.
         """
         try:
-            total_products = self.env['product.product'].search_count([
+            count = self.env['product.product'].search_count([
                 ('type', '=', 'product'),
                 ('active', '=', True)
             ])
             return {
-                'total_products': total_products,
+                'total_products': count,
                 'status': 'success'
             }
         except Exception as e:
@@ -24,50 +65,57 @@ class AIQueryHandler(models.AbstractModel):
                 'message': str(e)
             }
 
+    # ================= CRM =================
+
     @api.model
-    def get_inventory_summary(self):
+    def get_crm_summary(self):
         """
-        Retorna un resumen completo del inventario actual.
+        Retorna resumen correcto de CRM.
         """
         try:
-            # Contar productos totales (solo productos almacenables)
-            total_products = self.env['product.product'].search_count([
-                ('type', '=', 'product'),
-                ('active', '=', True)
+            Lead = self.env['crm.lead']
+
+            total_opportunities = Lead.search_count([
+                ('type', '=', 'opportunity')
             ])
-            
-            # Stock total disponible
-            stock_quants = self.env['stock.quant'].search([
-                ('location_id.usage', '=', 'internal'),
-                ('quantity', '>', 0)
-            ])
-            total_quantity = sum(quant.quantity for quant in stock_quants)
-            
-            # Productos con bajo stock (cantidad <= 5)
-            low_stock = self.env['product.product'].search([
-                ('type', '=', 'product'),
+
+            open_opportunities = Lead.search_count([
+                ('type', '=', 'opportunity'),
                 ('active', '=', True),
-                ('qty_available', '<=', 5),
-                ('qty_available', '>', 0)
-            ], limit=20)
-            
-            low_stock_products = [
-                {
-                    'id': product.id,
-                    'name': product.name,
-                    'qty_available': product.qty_available,
-                    'uom': product.uom_id.name
-                }
-                for product in low_stock
-            ]
-            
+                ('probability', 'not in', [0, 100])
+            ])
+
+            won_opportunities = Lead.search_count([
+                ('type', '=', 'opportunity'),
+                ('probability', '=', 100)
+            ])
+
+            lost_opportunities = Lead.search_count([
+                ('type', '=', 'opportunity'),
+                ('probability', '=', 0),
+                ('active', '=', False)
+            ])
+
+            open_leads = Lead.search([
+                ('type', '=', 'opportunity'),
+                ('active', '=', True),
+                ('probability', 'not in', [0, 100])
+            ])
+
+            total_expected_revenue = sum(
+                lead.expected_revenue or 0 for lead in open_leads
+            )
+
             return {
-                'total_products': total_products,
-                'total_stock_quantity': total_quantity,
-                'low_stock_products': low_stock_products,
+                'total_opportunities': total_opportunities,
+                'open_opportunities': open_opportunities,
+                'won_opportunities': won_opportunities,
+                'lost_opportunities': lost_opportunities,
+                'total_expected_revenue': total_expected_revenue,
+                'currency': self.env.company.currency_id.name,
                 'status': 'success'
             }
-            
+
         except Exception as e:
             return {
                 'status': 'error',
@@ -77,65 +125,16 @@ class AIQueryHandler(models.AbstractModel):
     @api.model
     def get_open_opportunities_count(self):
         """
-        Retorna el total de oportunidades activas (no ganadas ni perdidas).
+        Conteo simple de oportunidades abiertas.
         """
         try:
-            open_opportunities = self.env['crm.lead'].search_count([
-                ('stage_id.is_won', '=', False),
-                ('stage_id.is_lost', '=', False)
+            count = self.env['crm.lead'].search_count([
+                ('type', '=', 'opportunity'),
+                ('active', '=', True),
+                ('probability', 'not in', [0, 100])
             ])
             return {
-                'open_opportunities': open_opportunities,
-                'status': 'success'
-            }
-        except Exception as e:
-            return {
-                'status': 'error',
-                'message': str(e)
-            }
-
-    @api.model
-    def get_crm_summary(self):
-        """
-        Retorna resumen completo de CRM: total, abiertas, ganadas, perdidas, e ingresos esperados.
-        """
-        try:
-            # Total de oportunidades
-            total_opportunities = self.env['crm.lead'].search_count([])
-            
-            # Oportunidades abiertas
-            open_opportunities = self.env['crm.lead'].search_count([
-                ('stage_id.is_won', '=', False),
-                ('stage_id.is_lost', '=', False)
-            ])
-            
-            # Oportunidades ganadas
-            won_opportunities = self.env['crm.lead'].search_count([
-                ('stage_id.is_won', '=', True)
-            ])
-            
-            # Oportunidades perdidas
-            lost_opportunities = self.env['crm.lead'].search_count([
-                ('stage_id.is_lost', '=', True)
-            ])
-            
-            # Ingresos esperados
-            opportunities = self.env['crm.lead'].search([
-                ('stage_id.is_won', '=', False),
-                ('stage_id.is_lost', '=', False)
-            ])
-            total_expected_revenue = sum(opp.expected_revenue or 0 for opp in opportunities)
-            
-            # Obtener moneda
-            currency = self.env.company.currency_id.name if self.env.company.currency_id else 'USD'
-            
-            return {
-                'total_opportunities': total_opportunities,
-                'open_opportunities': open_opportunities,
-                'won_opportunities': won_opportunities,
-                'lost_opportunities': lost_opportunities,
-                'total_expected_revenue': total_expected_revenue,
-                'currency': currency,
+                'open_opportunities': count,
                 'status': 'success'
             }
         except Exception as e:
@@ -147,37 +146,39 @@ class AIQueryHandler(models.AbstractModel):
     @api.model
     def get_opportunities_by_stage(self):
         """
-        Retorna oportunidades agrupadas por etapa del pipeline.
+        Oportunidades agrupadas por etapa.
         """
         try:
-            stages = self.env['crm.stage'].search([], order='sequence')
-            
+            Stage = self.env['crm.stage']
+            Lead = self.env['crm.lead']
+
             stages_data = []
-            for stage in stages:
-                opportunities = self.env['crm.lead'].search([
-                    ('stage_id', '=', stage.id)
+
+            for stage in Stage.search([], order='sequence'):
+                opportunities = Lead.search([
+                    ('type', '=', 'opportunity'),
+                    ('stage_id', '=', stage.id),
+                    ('active', '=', True)
                 ])
-                count = len(opportunities)
-                expected_revenue = sum(opp.expected_revenue or 0 for opp in opportunities)
-                
-                if count > 0:
+
+                if opportunities:
                     stages_data.append({
                         'stage_id': stage.id,
                         'stage_name': stage.name,
-                        'count': count,
-                        'expected_revenue': expected_revenue,
+                        'count': len(opportunities),
+                        'expected_revenue': sum(
+                            opp.expected_revenue or 0 for opp in opportunities
+                        ),
                         'sequence': stage.sequence
                     })
-            
-            # Obtener moneda
-            currency = self.env.company.currency_id.name if self.env.company.currency_id else 'USD'
-            
+
             return {
                 'stages': stages_data,
                 'total_stages': len(stages_data),
-                'currency': currency,
+                'currency': self.env.company.currency_id.name,
                 'status': 'success'
             }
+
         except Exception as e:
             return {
                 'status': 'error',
