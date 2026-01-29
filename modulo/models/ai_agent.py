@@ -1,12 +1,11 @@
 from odoo import models, api, fields
-from odoo.addons.mail_bot.models.mail_bot import _WELCOME_MESSAGE
 
 class AIInventoryAgent(models.Model):
     _name = 'ai.inventory.agent'
     _description = 'AI Inventory Agent'
-    _inherit = 'mail.bot'
     
     name = fields.Char(default="Inventory Assistant")
+    description = fields.Text()
     
     @api.model
     def _get_tools(self):
@@ -61,9 +60,3 @@ Be friendly, clear, and provide specific numbers.
 Format: "We have {number} {unit}" or "Tenemos {número} {unidad}"
 
 If you encounter an error, inform the user politely."""
-    
-    @api.model
-    def _chat_post_message(self, message, author=None, **kwargs):
-        """Procesa mensajes del chat"""
-        # Aquí va la lógica para procesar el mensaje con IA
-        pass
