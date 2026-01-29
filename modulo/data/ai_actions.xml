@@ -6,6 +6,5 @@
         <field name="code">
 result = env['ai.inventory.actions'].get_stock(product_name)
         </field>
-        <field name="use_in_ai">True</field>
     </record>
 </odoo>
