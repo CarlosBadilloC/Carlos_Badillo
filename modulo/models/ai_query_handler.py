@@ -25,46 +25,31 @@ class AIQueryHandler(models.AbstractModel):
             }
 
 @api.model
-def get_inventory_summary(self):
-    _logger.error("🔥 get_inventory_summary EJECUTADO")
-    """
-    Resumen de inventario alineado con Inventory > Reporting > Stock
-    """
-    try:
-        Product = self.env['product.product']
+def get_inventory_summary_answer(self):
+    data = self.get_inventory_summary()
 
-        products = Product.search([
-            ('type', '=', 'product'),
-            ('active', '=', True)
-        ])
-
-        total_products = len(products)
-        total_quantity = sum(products.mapped('qty_available'))
-
-        low_stock_products = [
-            {
-                'id': p.id,
-                'name': p.display_name,
-                'qty_available': p.qty_available,
-                'uom': p.uom_id.name
-            }
-            for p in products
-            if 0 < p.qty_available <= 5
-        ]
-
-        return {
-            'source': 'inventory_report_on_hand',
-            'total_products': total_products,
-            'total_stock_quantity': total_quantity,
-            'low_stock_products': low_stock_products,
-            'status': 'success'
-        }
-
-    except Exception as e:
+    if data.get('status') != 'success':
         return {
             'status': 'error',
-            'message': str(e)
+            'answer': 'No fue posible obtener el inventario.'
         }
+
+    total_products = data['total_products']
+    total_stock = data['total_stock_quantity']
+    low_stock = data['low_stock_products']
+
+    answer = (
+        f"Actualmente hay {total_stock} unidades en stock "
+        f"distribuidas en {total_products} productos."
+    )
+
+    if low_stock:
+        answer += f" Además, {len(low_stock)} productos tienen stock bajo."
+
+    return {
+        'status': 'success',
+        'answer': answer
+    }
 
 
     @api.model

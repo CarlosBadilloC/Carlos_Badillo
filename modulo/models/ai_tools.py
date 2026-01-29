@@ -159,7 +159,7 @@ class AIToolsRegistry(models.AbstractModel):
         # Mapeo: tool_id → (modelo, método)
         tool_mapping = {
             'get_product_count': ('ai.query.handler', 'get_product_count'),
-            'get_inventory_summary': ('ai.query.handler', 'get_inventory_summary'),
+            'get_inventory_summary': ('ai.query.handler', 'get_inventory_summary_answer'),
             'get_open_opportunities_count': ('ai.query.handler', 'get_open_opportunities_count'),
             'get_crm_summary': ('ai.query.handler', 'get_crm_summary'),
             'get_opportunities_by_stage': ('ai.query.handler', 'get_opportunities_by_stage'),

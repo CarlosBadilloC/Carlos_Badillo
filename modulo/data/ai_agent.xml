@@ -1,9 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <data>
-        <record id="ai_inventory_agent" model="ai.inventory.agent">
+    <data noupdate="1">
+
+        <record id="ai_inventory_agent" model="ai.agent">
             <field name="name">Inventory &amp; CRM Assistant</field>
-            <field name="description">AI Assistant for inventory and CRM queries</field>
+
+            <field name="description">
+                AI Assistant for inventory and CRM queries
+            </field>
+
+            <!-- Modelo LLM -->
+            <field name="model_id" ref="ai.model_gpt_4o"/>
+
+            <!-- Estilo de respuesta -->
+            <field name="response_style">balanced</field>
+
+            <!-- Prompt del sistema -->
+            <field name="system_prompt">
+                You are an AI assistant specialized in inventory and CRM.
+                You can answer stock questions, product availability,
+                and customer-related queries using Odoo data.
+            </field>
+
+            <!-- Permitir acciones servidor -->
+            <field name="use_server_actions" eval="True"/>
+
         </record>
+
     </data>
 </odoo>
