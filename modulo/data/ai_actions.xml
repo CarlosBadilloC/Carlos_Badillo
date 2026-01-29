@@ -8,6 +8,42 @@ result = env['ai.inventory.actions'].get_stock(product_name)
         </field>
         <field name="use_in_ai">True</field>
         <field name="ai_tool_description">Consulta el stock disponible de un producto en el inventario</field>
-        <field name="ai_action_prompt">Busca información del stock del producto solicitado</field>
+        <field name="ai_action_prompt">Cuando el usuario pregunta por el stock de un producto, usa esta herramienta</field>
+    </record>
+
+    <record id="ai_action_check_low_stock" model="ir.actions.server">
+        <field name="name">Verificar Stock Bajo</field>
+        <field name="model_id" ref="product.model_product_product"/>
+        <field name="state">code</field>
+        <field name="code">
+result = env['ai.inventory.actions'].check_low_stock(threshold or 10)
+        </field>
+        <field name="use_in_ai">True</field>
+        <field name="ai_tool_description">Verifica productos con stock por debajo del umbral especificado</field>
+        <field name="ai_action_prompt">Cuando el usuario pregunta sobre productos con poco stock, usa esta herramienta</field>
+    </record>
+
+    <record id="ai_action_inventory_summary" model="ir.actions.server">
+        <field name="name">Resumen de Inventario</field>
+        <field name="model_id" ref="product.model_product_product"/>
+        <field name="state">code</field>
+        <field name="code">
+result = env['ai.inventory.actions'].get_inventory_summary()
+        </field>
+        <field name="use_in_ai">True</field>
+        <field name="ai_tool_description">Obtiene un resumen completo del estado del inventario</field>
+        <field name="ai_action_prompt">Cuando el usuario pide un resumen o estado general del inventario, usa esta herramienta</field>
+    </record>
+
+    <record id="ai_action_search_by_category" model="ir.actions.server">
+        <field name="name">Buscar Productos por Categoría</field>
+        <field name="model_id" ref="product.model_product_product"/>
+        <field name="state">code</field>
+        <field name="code">
+result = env['ai.inventory.actions'].search_product_by_category(category_name)
+        </field>
+        <field name="use_in_ai">True</field>
+        <field name="ai_tool_description">Busca productos por categoría especificada</field>
+        <field name="ai_action_prompt">Cuando el usuario pregunta por productos de una categoría, usa esta herramienta</field>
     </record>
 </odoo>
