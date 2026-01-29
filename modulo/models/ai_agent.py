@@ -10,8 +10,7 @@ _logger = logging.getLogger(__name__)
 class DiscussChannel(models.Model):
     _inherit = 'discuss.channel'
     
-    @api.model
-   def message_new(self, msg_dict, custom_values=None):
+def message_new(self, msg_dict, custom_values=None):
     _logger.warning("🤖 Mensaje recibido por AI AGENT")
 
     message = super().message_new(msg_dict, custom_values)
