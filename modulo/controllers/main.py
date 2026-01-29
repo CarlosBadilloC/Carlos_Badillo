@@ -7,7 +7,7 @@ class AIInventoryController(http.Controller):
     Endpoints consumibles por JSON-RPC (Postman, APIs externas).
     """
 
-    @http.route('/ai/inventory/count', type='json', auth='user')
+    @http.route('/ai/inventory/count', type='jsonrpc', auth='user')
     def count_products(self):
         """
         Endpoint: GET /ai/inventory/count
@@ -16,7 +16,7 @@ class AIInventoryController(http.Controller):
         handler = request.env['ai.query.handler']
         return handler.get_product_count()
 
-    @http.route('/ai/inventory/summary', type='json', auth='user')
+    @http.route('/ai/inventory/summary', type='jsonrpc', auth='user')
     def inventory_summary(self):
         """
         Endpoint: GET /ai/inventory/summary
@@ -26,7 +26,7 @@ class AIInventoryController(http.Controller):
         result = handler.get_inventory_summary()
         return result
 
-    @http.route('/ai/crm/summary', type='json', auth='user')
+    @http.route('/ai/crm/summary', type='jsonrpc', auth='user')
     def crm_summary(self):
         """
         Endpoint: GET /ai/crm/summary
@@ -35,7 +35,7 @@ class AIInventoryController(http.Controller):
         handler = request.env['ai.query.handler']
         return handler.get_crm_summary()
 
-    @http.route('/ai/crm/opportunities/count', type='json', auth='user')
+    @http.route('/ai/crm/opportunities/count', type='jsonrpc', auth='user')
     def open_opportunities_count(self):
         """
         Endpoint: GET /ai/crm/opportunities/count
@@ -44,7 +44,7 @@ class AIInventoryController(http.Controller):
         handler = request.env['ai.query.handler']
         return handler.get_open_opportunities_count()
 
-    @http.route('/ai/crm/opportunities/stages', type='json', auth='user')
+    @http.route('/ai/crm/opportunities/stages', type='jsonrpc', auth='user')
     def opportunities_by_stage(self):
         """
         Endpoint: GET /ai/crm/opportunities/stages
