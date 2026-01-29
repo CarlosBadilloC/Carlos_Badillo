@@ -9,7 +9,7 @@ class AIQueryHandler(models.AbstractModel):
     @api.model
     def get_inventory_summary(self):
         """
-        Retorna un resumen correcto del inventario usando qty_available.
+        Resumen de inventario preparado para consumo por IA (sin ambigüedades).
         """
         try:
             Product = self.env['product.product']
@@ -19,23 +19,34 @@ class AIQueryHandler(models.AbstractModel):
                 ('active', '=', True)
             ])
 
-            total_products = len(products)
-            total_stock_quantity = sum(products.mapped('qty_available'))
+            number_of_products = len(products)
+            total_units_in_stock = sum(products.mapped('qty_available'))
 
-            low_stock_products = []
-            for p in products:
-                if 0 < p.qty_available <= 5:
-                    low_stock_products.append({
-                        'id': p.id,
-                        'name': p.display_name,
-                        'qty_available': p.qty_available,
-                        'uom': p.uom_id.name,
-                    })
+            low_stock_products = [
+                {
+                    'id': p.id,
+                    'name': p.display_name,
+                    'qty_available': p.qty_available,
+                    'uom': p.uom_id.name,
+                }
+                for p in products
+                if 0 < p.qty_available <= 5
+            ]
 
             return {
-                'total_products': total_products,
-                'total_stock_quantity': total_stock_quantity,
+                # 🔑 claves claras para IA
+                'number_of_products': number_of_products,
+                'total_units_in_stock': total_units_in_stock,
+
+                # datos auxiliares
                 'low_stock_products': low_stock_products[:10],
+
+                # texto ya interpretado (blindaje extra)
+                'summary_text': (
+                    f'Actualmente hay {total_units_in_stock} unidades disponibles '
+                    f'en inventario, considerando {number_of_products} productos distintos.'
+                ),
+
                 'status': 'success'
             }
 
