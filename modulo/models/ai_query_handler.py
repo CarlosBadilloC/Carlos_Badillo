@@ -26,6 +26,7 @@ class AIQueryHandler(models.AbstractModel):
 
 @api.model
 def get_inventory_summary(self):
+    _logger.error("🔥 get_inventory_summary EJECUTADO")
     """
     Resumen de inventario alineado con Inventory > Reporting > Stock
     """
