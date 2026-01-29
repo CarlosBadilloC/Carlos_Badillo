@@ -22,7 +22,10 @@ Long description of module's purpose
     # always loaded
     'data': [
         # 'security/ir.model.access.csv',
-        'data/ai_agent_data.xml',
+        'data/ai_actions.xml',
+        'data/ai_agent.xml',
+        'data/ai_composer.xml',
+        'data/ai_agent_source.xml',
         'views/views.xml',
         'views/templates.xml',
         'views/res_config_settings_views.xml',
