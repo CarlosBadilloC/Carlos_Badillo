@@ -1,7 +1,4 @@
 <odoo>
-    <record id="ai_agent_inventory_source" model="ai.agent.source">
-        <field name="agent_id" ref="inventory_ai_agent"/>
-        <field name="source_type">model</field>
-        <field name="res_model">product.product</field>
-    </record>
+    <!-- Las sources en Odoo 19 son para archivos, PDFs, enlaces, no para modelos.
+         Si necesitas conectar datos de producto, usa ai.tool en ir.actions.server -->
 </odoo>

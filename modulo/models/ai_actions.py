@@ -6,6 +6,7 @@ class AIInventoryActions(models.AbstractModel):
 
     @api.model
     def get_stock(self, product_name):
+        """Obtiene información del stock de productos"""
         products = self.env['product.product'].sudo().search([
             ('name', 'ilike', product_name)
         ], limit=5)
@@ -15,8 +16,12 @@ class AIInventoryActions(models.AbstractModel):
 
         result = []
         for p in products:
+            status = "✅ Disponible" if p.qty_available > 0 else "❌ Sin stock"
             result.append(
-                f"{p.name}: {p.qty_available} uds (Precio ${p.list_price})"
+                f"{p.name}\n"
+                f"  • Stock: {int(p.qty_available)} unidades\n"
+                f"  • Precio: ${p.list_price}\n"
+                f"  • Estado: {status}"
             )
 
-        return "\n".join(result)
+        return "\n\n".join(result)

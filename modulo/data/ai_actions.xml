@@ -1,9 +1,12 @@
 <odoo>
     <record id="ai_action_get_stock" model="ir.actions.server">
-        <field name="name">AI: Obtener stock</field>
+        <field name="name">Obtener Stock de Producto</field>
         <field name="state">code</field>
         <field name="code">
-action = env['ai.inventory.actions'].get_stock('producto')
+result = env['ai.inventory.actions'].get_stock(product_name)
         </field>
+        <field name="use_in_ai">True</field>
+        <field name="ai_tool_description">Consulta el stock disponible de un producto en el inventario</field>
+        <field name="ai_action_prompt">Busca información del stock del producto solicitado</field>
     </record>
 </odoo>
