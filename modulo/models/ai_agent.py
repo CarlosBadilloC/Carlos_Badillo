@@ -110,6 +110,33 @@ class AIAgent(models.Model):
             return "\n".join(text_content)
         except Exception as e:
             return f"Error extrayendo PDF: {str(e)}"
+    def _get_inventory_summary(self):
+        """Resumen de stock de productos"""
+        products = self.env['product.product'].search([])
+        summary = []
+        for product in products:
+            qty = sum(product.stock_quant_ids.mapped('quantity'))
+            summary.append(f"{product.display_name}: {qty}")
+        return "\n".join(summary) if summary else "No hay productos en inventario."
+
+    def _get_crm_today(self):
+        """Resumen de actividades CRM para hoy"""
+        today = fields.Date.today()
+        leads = self.env['crm.lead'].search([('date_deadline', '=', today)])
+        events = self.env['calendar.event'].search([
+            ('start', '>=', fields.Datetime.now()),
+            ('stop', '<=', fields.Datetime.now().replace(hour=23, minute=59, second=59))
+        ])
+        res = []
+        if leads:
+            res.append("Oportunidades para hoy:")
+            for lead in leads:
+                res.append(f"- {lead.name} ({lead.stage_id.name})")
+        if events:
+            res.append("Reuniones para hoy:")
+            for event in events:
+                res.append(f"- {event.name} ({event.start} - {event.stop})")
+        return "\n".join(res) if res else "No hay actividades CRM para hoy."
 
     def action_process_documents_with_llm(self):
         """Procesa documentos con Google Gemini"""
@@ -168,6 +195,12 @@ Analiza el siguiente contenido de documento y proporciona un resumen detallado:
     def action_ask_gemini(self, question):
         """Realiza una pregunta a Gemini sobre los documentos"""
         self.ensure_one()
+        # Respuestas directas para inventario y CRM
+        q_lower = question.lower()
+        if "stock" in q_lower or "inventario" in q_lower:
+            return self._get_inventory_summary()
+        if "crm" in q_lower or "oportunidad" in q_lower or "hoy" in q_lower:
+            return self._get_crm_today()
         
         if not HAS_GEMINI:
             return "Error: google-generativeai no está instalado"

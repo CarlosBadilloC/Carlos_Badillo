@@ -18,4 +18,16 @@
 #         return http.request.render('modulo.object', {
 #             'object': obj
 #         })
+from odoo import http
+from odoo.http import request
+
+class AIAgentChatController(http.Controller):
+
+    @http.route('/ai_agent/livechat', type='json', auth='public', csrf=False)
+    def livechat_message(self, message, agent_id=None, **kwargs):
+        agent = request.env['ai.agent'].browse(agent_id) if agent_id else request.env['ai.agent'].search([], limit=1)
+        if not agent:
+            return {"error": "No se encontró agente"}
+        response = agent.action_ask_gemini(message)
+        return {"response": response}
 
