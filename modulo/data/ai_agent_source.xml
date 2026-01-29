@@ -1,5 +1,5 @@
 <odoo>
-    <record id="ai_composer_inventory" model="ai.composer">
+    <record id="ai_composer_inventory" model="ai.agent.source">
         <field name="name">Inventario AI Composer</field>
         <field name="system_prompt">
             Eres un asistente experto en inventario de Odoo.
