@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <record id="res_config_settings_view_form_inherit_ai" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.ai</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+
+            <!-- Insertamos una nueva tarjeta en Settings -->
+            <xpath expr="//form" position="inside">
+                <app_settings_block
+                    title="AI Configuration"
+                    string="AI Configuration"
+                    icon="fa-brain">
+
+                    <block title="API Settings">
+                        <setting string="AI API Key">
+                            <field name="ai_api_key"
+                                   password="True"
+                                   placeholder="Ingrese su API Key"/>
+                            <div class="text-muted">
+                                Clave de acceso para el proveedor de IA (OpenAI, Gemini, etc.).
+                            </div>
+                        </setting>
+                    </block>
+
+                </app_settings_block>
+            </xpath>
+
+        </field>
+    </record>
+
+</odoo>
