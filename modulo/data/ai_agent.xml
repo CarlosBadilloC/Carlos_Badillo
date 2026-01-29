@@ -1,7 +1,6 @@
 <odoo>
     <record id="inventory_ai_agent" model="ai.agent">
         <field name="name">AI Inventario</field>
-        <field name="model_id" ref="product.model_product_product"/>
         <field name="active">True</field>
     </record>
 </odoo>
