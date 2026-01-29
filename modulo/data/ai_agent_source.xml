@@ -1,6 +1,7 @@
 <odoo>
     <record id="ai_agent_inventory_source" model="ai.agent.source">
         <field name="agent_id" ref="inventory_ai_agent"/>
-        <field name="model_id" ref="product.model_product_product"/>
+        <field name="source_type">model</field>
+        <field name="res_model">product.product</field>
     </record>
 </odoo>

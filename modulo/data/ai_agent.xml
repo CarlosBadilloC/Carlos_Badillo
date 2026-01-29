@@ -2,5 +2,8 @@
     <record id="inventory_ai_agent" model="ai.agent">
         <field name="name">AI Inventario</field>
         <field name="active">True</field>
+        <field name="model_id">base.model_res_partner</field>
+        <field name="system_prompt">Eres un asistente especializado en gestión de inventario. Tu rol es ayudar a los usuarios a consultar la disponibilidad de productos, verificar niveles de stock, y proporcionar información sobre precios y disponibilidad. Siempre responde de manera clara y precisa basándote en los datos actuales del inventario.</field>
+        <field name="response_style">balanced</field>
     </record>
 </odoo>
