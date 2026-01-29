@@ -18,9 +18,6 @@
     """,
 
     'author': "Carlos Badillo",
-    'models': [
-        'models/crm_inventory_metrics.py',  # Añadir esta línea
-    ],
 
     'category': 'Tools',
     'version': '1.0.0',
@@ -31,6 +28,8 @@
         'product',
         'stock',
         'crm',
+        'mail_bot',  
+        'im_livechat',
     ],
     
     'application': False,
@@ -41,6 +40,7 @@
     'data': [
         'security/ir.model.access.csv',
         'data/ai_prompts.xml',
+        'data/ai_agent.xml',
         'views/test_views.xml',
     ],
     

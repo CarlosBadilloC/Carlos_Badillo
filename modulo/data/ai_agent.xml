@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="ai_inventory_agent" model="ai.inventory.agent">
+            <field name="name">Inventory & CRM Assistant</field>
+            <field name="description">AI Assistant for inventory and CRM queries</field>
+        </record>
+    </data>
+</odoo>
