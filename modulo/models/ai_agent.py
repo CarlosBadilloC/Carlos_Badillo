@@ -11,25 +11,30 @@ class DiscussChannel(models.Model):
     _inherit = 'discuss.channel'
     
     @api.model
-    def message_post(self, **kwargs):
-        _logger.warning("🔥 message_post interceptado en AI AGENT")
-        """Override message_post para interceptar mensajes y procesarlos con IA"""
-        message = super(DiscussChannel, self).message_post(**kwargs)
-        
-        # Verificar si es el canal del AI Agent
-        if self.name == 'AI AGENT' and kwargs.get('body'):
-            try:
-                response = self._process_ai_message(kwargs.get('body'))
-                if response:
-                    self.message_post(
-                        body=response,
-                        message_type='comment',
-                        subtype_xmlid='mail.mt_comment'
-                    )
-            except Exception as e:
-                _logger.error(f"Error procesando mensaje IA: {str(e)}\n{traceback.format_exc()}")
-        
+   def message_new(self, msg_dict, custom_values=None):
+    _logger.warning("🤖 Mensaje recibido por AI AGENT")
+
+    message = super().message_new(msg_dict, custom_values)
+
+    if self.name != 'AI AGENT':
         return message
+
+    body = msg_dict.get('body')
+    if not body:
+        return message
+
+    try:
+        response = self._process_ai_message(body)
+        if response:
+            self.with_user(self.env.ref('base.user_admin')).message_post(
+                body=response,
+                message_type='comment',
+                subtype_xmlid='mail.mt_comment'
+            )
+    except Exception as e:
+        _logger.error(f"Error IA: {e}", exc_info=True)
+
+    return message
     
 def _process_ai_message(self, user_message):
     api_key = self.env['ir.config_parameter'].sudo().get_param('modulo.ai_api_key')
