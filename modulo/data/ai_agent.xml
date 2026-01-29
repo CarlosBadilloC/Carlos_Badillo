@@ -1,5 +1,5 @@
 <odoo>
-    <record id="inventory_ai_agent" model="ai.agent">
+    <record id="ai_agent_inventory" model="ai.agent">
         <field name="name">AI Inventario</field>
         <field name="active">True</field>
     </record>
