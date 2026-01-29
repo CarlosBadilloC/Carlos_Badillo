@@ -1,10 +1,7 @@
 <odoo>
-    <record id="ai_agent_inventory" model="ai.agent">
-        <field name="name">Agente Inventario</field>
-        <field name="description">
-            Agente que responde consultas sobre inventario y stock en Odoo.
-        </field>
-        <field name="model">gemini-2.5-flash</field>
+    <record id="inventory_ai_agent" model="ai.agent">
+        <field name="name">AI Inventario</field>
+        <field name="model_id" ref="product.model_product_product"/>
         <field name="active">True</field>
     </record>
 </odoo>
