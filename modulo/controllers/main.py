@@ -23,7 +23,8 @@ class AIInventoryController(http.Controller):
         Retorna resumen completo del inventario.
         """
         handler = request.env['ai.query.handler']
-        return handler.get_inventory_summary()
+        result = handler.get_inventory_summary()
+        return result
 
     @http.route('/ai/crm/summary', type='json', auth='user')
     def crm_summary(self):
