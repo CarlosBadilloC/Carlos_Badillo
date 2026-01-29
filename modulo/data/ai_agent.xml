@@ -1,13 +1,6 @@
 <odoo>
-    <record id="ai_agent_inventory" model="ai.agent">
+    <record id="inventory_ai_agent" model="ai.agent">
         <field name="name">AI Inventario</field>
         <field name="active">True</field>
-
-        <!-- PROMPT DEL AGENTE -->
-        <field name="system_prompt">
-            Eres un asistente experto en inventario de Odoo.
-            Respondes preguntas sobre productos, stock y disponibilidad.
-            Usa únicamente las acciones disponibles.
-        </field>
     </record>
 </odoo>
