@@ -78,5 +78,3 @@ class AIInventoryActions(models.AbstractModel):
             result.append(f"  • {p.name}: {int(p.qty_available)} unidades")
         
         return "\n".join(result)
-
-        return "\n\n".join(result)
