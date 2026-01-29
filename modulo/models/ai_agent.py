@@ -12,6 +12,7 @@ class DiscussChannel(models.Model):
     
     @api.model
     def message_post(self, **kwargs):
+        _logger.warning("🔥 message_post interceptado en AI AGENT")
         """Override message_post para interceptar mensajes y procesarlos con IA"""
         message = super(DiscussChannel, self).message_post(**kwargs)
         
