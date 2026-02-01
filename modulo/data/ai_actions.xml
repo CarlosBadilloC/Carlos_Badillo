@@ -11,6 +11,25 @@ result = env['ai.inventory.actions'].get_stock(product_name)
         <field name="ai_action_prompt">Cuando el usuario pregunta por el stock de un producto, usa esta herramienta</field>
     </record>
 
+    <record id="ai_action_create_lead" model="ir.actions.server">
+        <field name="name">Crear Lead</field>
+        <field name="model_id" ref="crm.model_crm_lead"/>
+        <field name="state">code</field>
+        <field name="code">
+result = env['ai.crm.actions'].create_lead(
+    name,
+    customer_name,
+    email,
+    phone,
+    stage_name,
+    expected_revenue
+)
+        </field>
+        <field name="use_in_ai">True</field>
+        <field name="ai_tool_description">Crea un lead con nombre, cliente, email, teléfono, etapa e ingreso esperado</field>
+        <field name="ai_action_prompt">Cuando el usuario pide crear un lead, usa esta herramienta</field>
+    </record>
+
     <record id="ai_action_check_low_stock" model="ir.actions.server">
         <field name="name">Verificar Stock Bajo</field>
         <field name="model_id" ref="product.model_product_product"/>

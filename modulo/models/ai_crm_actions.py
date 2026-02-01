@@ -97,3 +97,54 @@ class AICrmActions(models.AbstractModel):
             result.append(f"  • {l.name} ({tipo})")
 
         return "\n".join(result)
+    
+    @api.model
+    def create_lead(self, name, customer_name=None, email=None, phone=None, stage_name=None, expected_revenue=0.0):
+        """Crea un lead con los campos indicados"""
+        if not name:
+            return "❌ El nombre del lead es obligatorio."
+
+        partner = False
+        if customer_name or email or phone:
+            domain = []
+            if email:
+                domain = ['|', ('email', '=', email), ('name', 'ilike', customer_name or '')]
+            elif phone:
+                domain = ['|', ('phone', '=', phone), ('name', 'ilike', customer_name or '')]
+            else:
+                domain = [('name', 'ilike', customer_name)]
+            partner = self.env['res.partner'].sudo().search(domain, limit=1)
+            if not partner and customer_name:
+                partner = self.env['res.partner'].sudo().create({
+                    'name': customer_name,
+                    'email': email,
+                    'phone': phone,
+                })
+
+        stage_id = False
+        if stage_name:
+            stage = self.env['crm.stage'].sudo().search([('name', 'ilike', stage_name)], limit=1)
+            stage_id = stage.id if stage else False
+
+        lead_vals = {
+            'name': name,
+            'partner_id': partner.id if partner else False,
+            'email_from': email,
+            'phone': phone,
+            'expected_revenue': expected_revenue or 0.0,
+            'type': 'lead',
+        }
+        if stage_id:
+            lead_vals['stage_id'] = stage_id
+
+        lead = self.env['crm.lead'].sudo().create(lead_vals)
+
+        stage_label = lead.stage_id.name if lead.stage_id else "Sin etapa"
+        return (
+            f"✅ Lead creado: {lead.name}\n"
+            f"  • Cliente: {lead.partner_id.display_name or 'Sin cliente'}\n"
+            f"  • Email: {lead.email_from or 'Sin email'}\n"
+            f"  • Teléfono: {lead.phone or 'Sin teléfono'}\n"
+            f"  • Etapa: {stage_label}\n"
+            f"  • Ingreso esperado: ${lead.expected_revenue:,.2f}"
+        )
