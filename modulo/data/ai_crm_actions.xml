@@ -8,7 +8,17 @@ result = env['ai.crm.actions'].get_lead_info(lead_name)
         </field>
         <field name="use_in_ai">True</field>
         <field name="ai_tool_description">Consulta información de un lead u oportunidad por nombre</field>
-        <field name="ai_action_prompt">Cuando el usuario pide información de un lead u oportunidad, usa esta herramienta</field>
+        <field name="ai_action_prompt">Consulta información de un lead u oportunidad</field>
+        <field name="ai_tool_schema">{
+  "type": "object",
+  "properties": {
+    "lead_name": {
+      "type": "string",
+      "description": "Nombre del lead u oportunidad a buscar"
+    }
+  },
+  "required": ["lead_name"]
+}</field>
     </record>
 
     <record id="ai_action_list_open_opportunities" model="ir.actions.server">
@@ -20,7 +30,7 @@ result = env['ai.crm.actions'].list_open_opportunities(limit or 10)
         </field>
         <field name="use_in_ai">True</field>
         <field name="ai_tool_description">Lista oportunidades abiertas con probabilidad y valor esperado</field>
-        <field name="ai_action_prompt">Cuando el usuario pide oportunidades abiertas, usa esta herramienta</field>
+        <field name="ai_action_prompt">Lista todas las oportunidades abiertas actualmente</field>
     </record>
 
     <record id="ai_action_pipeline_summary" model="ir.actions.server">
@@ -32,7 +42,7 @@ result = env['ai.crm.actions'].get_pipeline_summary()
         </field>
         <field name="use_in_ai">True</field>
         <field name="ai_tool_description">Resume el pipeline por etapa con conteo y valor total</field>
-        <field name="ai_action_prompt">Cuando el usuario pide un resumen del pipeline, usa esta herramienta</field>
+        <field name="ai_action_prompt">Muestra un resumen del pipeline CRM por etapa</field>
     </record>
 
     <record id="ai_action_search_leads_by_stage" model="ir.actions.server">
@@ -44,7 +54,17 @@ result = env['ai.crm.actions'].search_leads_by_stage(stage_name)
         </field>
         <field name="use_in_ai">True</field>
         <field name="ai_tool_description">Busca leads u oportunidades por etapa especificada</field>
-        <field name="ai_action_prompt">Cuando el usuario pregunta por leads en una etapa, usa esta herramienta</field>
+        <field name="ai_action_prompt">Busca leads por etapa</field>
+        <field name="ai_tool_schema">{
+  "type": "object",
+  "properties": {
+    "stage_name": {
+      "type": "string",
+      "description": "Nombre de la etapa (New, Qualified, Proposition, Won)"
+    }
+  },
+  "required": ["stage_name"]
+}</field>
     </record>
 
     <record id="ai_action_create_opportunity" model="ir.actions.server">
@@ -72,16 +92,38 @@ result = env['ai.crm.actions'].create_opportunity(
 )
         </field>
         <field name="use_in_ai">True</field>
-        <field name="ai_tool_description">Crea una oportunidad</field>
-        <field name="ai_action_prompt">Crea una oportunidad en el CRM</field>
-        <field name="ai_param_spec">[
-            {"name": "name", "type": "char", "required": true, "description": "Nombre de la oportunidad"},
-            {"name": "customer_name", "type": "char", "required": false, "description": "Nombre del cliente"},
-            {"name": "email", "type": "char", "required": false, "description": "Email del cliente"},
-            {"name": "phone", "type": "char", "required": false, "description": "Teléfono"},
-            {"name": "stage_name", "type": "char", "required": false, "description": "Etapa: New, Qualified, Proposition, Won"},
-            {"name": "expected_revenue", "type": "float", "required": false, "description": "Ingreso esperado"}
-        ]</field>
+        <field name="ai_tool_description">Crea una oportunidad CRM con todos los detalles necesarios</field>
+        <field name="ai_action_prompt">Crea una oportunidad en CRM</field>
+        <field name="ai_tool_schema">{
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Nombre de la oportunidad"
+    },
+    "customer_name": {
+      "type": "string",
+      "description": "Nombre del cliente"
+    },
+    "email": {
+      "type": "string",
+      "description": "Email del cliente"
+    },
+    "phone": {
+      "type": "string",
+      "description": "Teléfono del cliente"
+    },
+    "stage_name": {
+      "type": "string",
+      "description": "Etapa: New, Qualified, Proposition, Won"
+    },
+    "expected_revenue": {
+      "type": "number",
+      "description": "Ingreso esperado en números"
+    }
+  },
+  "required": ["name"]
+}</field>
     </record>
 
 </odoo>
