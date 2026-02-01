@@ -54,23 +54,78 @@ class AICrmActions(models.AbstractModel):
         return "\n".join(result)
 
     @api.model
-    def get_pipeline_summary(self):
-        """Resumen del pipeline por etapa"""
-        data = self.env['crm.lead'].sudo().read_group(
-            [('type', '=', 'opportunity'), ('active', '=', True)],
-            ['expected_revenue:sum'],
-            ['stage_id'],
+    def create_opportunity(self, name, customer_name=None, email=None, phone=None, stage_name=None, expected_revenue=0.0):
+        """Crea una oportunidad con los campos indicados"""
+        if not name:
+            return "❌ El nombre de la oportunidad es obligatorio."
+
+        partner = False
+        if customer_name or email or phone:
+            domain = []
+            if email:
+                domain = ['|', ('email', '=', email), ('name', 'ilike', customer_name or '')]
+            elif phone:
+                domain = ['|', ('phone', '=', phone), ('name', 'ilike', customer_name or '')]
+            else:
+                domain = [('name', 'ilike', customer_name)]
+            partner = self.env['res.partner'].sudo().search(domain, limit=1)
+            if not partner and customer_name:
+                partner = self.env['res.partner'].sudo().create({
+                    'name': customer_name,
+                    'email': email,
+                    'phone': phone,
+                })
+
+        stage_id = False
+        if stage_name:
+            stage = self.env['crm.stage'].sudo().search([('name', 'ilike', stage_name)], limit=1)
+            stage_id = stage.id if stage else False
+
+        opportunity_vals = {
+            'name': name,
+            'partner_id': partner.id if partner else False,
+            'email_from': email,
+            'phone': phone,
+            'expected_revenue': expected_revenue or 0.0,
+            'type': 'opportunity',
+        }
+        if stage_id:
+            opportunity_vals['stage_id'] = stage_id
+
+        opportunity = self.env['crm.lead'].sudo().create(opportunity_vals)
+
+        stage_label = opportunity.stage_id.name if opportunity.stage_id else "Sin etapa"
+        return (
+            f"✅ Oportunidad creada: {opportunity.name}\n"
+            f"  • Cliente: {opportunity.partner_id.display_name or 'Sin cliente'}\n"
+            f"  • Email: {opportunity.email_from or 'Sin email'}\n"
+            f"  • Teléfono: {opportunity.phone or 'Sin teléfono'}\n"
+            f"  • Etapa: {stage_label}\n"
+            f"  • Ingreso esperado: ${opportunity.expected_revenue:,.2f}"
         )
 
-        if not data:
+    @api.model
+    def get_pipeline_summary(self):
+        """Resumen del pipeline por etapa (compatible Odoo 19)"""
+        opportunities = self.env['crm.lead'].sudo().search([
+            ('type', '=', 'opportunity'),
+            ('active', '=', True),
+        ])
+
+        if not opportunities:
             return "✅ No hay datos en el pipeline."
 
+        stage_data = {}
+        for opp in opportunities:
+            stage_name = opp.stage_id.name if opp.stage_id else "Sin etapa"
+            if stage_name not in stage_data:
+                stage_data[stage_name] = {'count': 0, 'revenue': 0.0}
+            stage_data[stage_name]['count'] += 1
+            stage_data[stage_name]['revenue'] += opp.expected_revenue
+
         result = ["📊 Resumen del pipeline por etapa:"]
-        for row in data:
-            stage = row['stage_id'][1] if row.get('stage_id') else "Sin etapa"
-            count = row['__count']
-            revenue = row['expected_revenue'] or 0.0
-            result.append(f"  • {stage}: {count} oportunidades - ${revenue:,.2f}")
+        for stage, data in stage_data.items():
+            result.append(f"  • {stage}: {data['count']} oportunidades - ${data['revenue']:,.2f}")
 
         return "\n".join(result)
 

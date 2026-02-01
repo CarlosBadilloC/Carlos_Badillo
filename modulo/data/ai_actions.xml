@@ -65,4 +65,5 @@ result = env['ai.inventory.actions'].search_product_by_category(category_name)
         <field name="ai_tool_description">Busca productos por categoría especificada</field>
         <field name="ai_action_prompt">Cuando el usuario pregunta por productos de una categoría, usa esta herramienta</field>
     </record>
+    
 </odoo>
