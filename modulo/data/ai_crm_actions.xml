@@ -8,7 +8,7 @@ result = env['ai.crm.actions'].get_lead_info(lead_name)
         </field>
         <field name="use_in_ai">True</field>
         <field name="ai_tool_description">Consulta información de un lead u oportunidad por nombre</field>
-        <field name="ai_action_prompt">Cuando el usuario pide información de un lead u oportunidad, usa esta herramienta</field>
+        <field name="ai_action_prompt">Cuando el usuario pide información de un lead u oportunidad, extrae el nombre y usa esta herramienta</field>
     </record>
 
     <record id="ai_action_list_open_opportunities" model="ir.actions.server">
@@ -20,7 +20,7 @@ result = env['ai.crm.actions'].list_open_opportunities(limit or 10)
         </field>
         <field name="use_in_ai">True</field>
         <field name="ai_tool_description">Lista oportunidades abiertas con probabilidad y valor esperado</field>
-        <field name="ai_action_prompt">Cuando el usuario pide oportunidades abiertas, usa esta herramienta</field>
+        <field name="ai_action_prompt">Cuando el usuario pide oportunidades abiertas o pipeline abierto, usa esta herramienta</field>
     </record>
 
     <record id="ai_action_pipeline_summary" model="ir.actions.server">
@@ -32,7 +32,7 @@ result = env['ai.crm.actions'].get_pipeline_summary()
         </field>
         <field name="use_in_ai">True</field>
         <field name="ai_tool_description">Resume el pipeline por etapa con conteo y valor total</field>
-        <field name="ai_action_prompt">Cuando el usuario pide un resumen del pipeline, usa esta herramienta</field>
+        <field name="ai_action_prompt">Cuando el usuario pide un resumen del pipeline o estado de etapas, usa esta herramienta</field>
     </record>
 
     <record id="ai_action_search_leads_by_stage" model="ir.actions.server">
@@ -43,8 +43,8 @@ result = env['ai.crm.actions'].get_pipeline_summary()
 result = env['ai.crm.actions'].search_leads_by_stage(stage_name)
         </field>
         <field name="use_in_ai">True</field>
-        <field name="ai_tool_description">Busca leads u oportunidades por etapa</field>
-        <field name="ai_action_prompt">Cuando el usuario pregunta por leads en una etapa, usa esta herramienta</field>
+        <field name="ai_tool_description">Busca leads u oportunidades por etapa especificada</field>
+        <field name="ai_action_prompt">Cuando el usuario pregunta por leads en una etapa específica, extrae el nombre de la etapa y usa esta herramienta</field>
     </record>
 
     <record id="ai_action_create_opportunity" model="ir.actions.server">
@@ -53,16 +53,16 @@ result = env['ai.crm.actions'].search_leads_by_stage(stage_name)
         <field name="state">code</field>
         <field name="code">
 result = env['ai.crm.actions'].create_opportunity(
-    name,
-    customer_name,
-    email,
-    phone,
-    stage_name,
-    expected_revenue
+    name=name,
+    customer_name=customer_name,
+    email=email,
+    phone=phone,
+    stage_name=stage_name,
+    expected_revenue=float(expected_revenue) if expected_revenue else 0.0
 )
         </field>
         <field name="use_in_ai">True</field>
-        <field name="ai_tool_description">Crea una oportunidad con nombre, cliente, email, teléfono, etapa e ingreso esperado</field>
-        <field name="ai_action_prompt">Cuando el usuario pide crear una oportunidad, usa esta herramienta</field>
+        <field name="ai_tool_description">Crea una oportunidad. Requiere: nombre (name), cliente (customer_name), email, teléfono (phone), etapa (stage_name), ingreso esperado (expected_revenue)</field>
+        <field name="ai_action_prompt">Cuando el usuario pide crear una oportunidad, extrae estos parámetros: nombre de la oportunidad, nombre del cliente, email, teléfono, nombre de la etapa (ej: Qualified, New, Proposition, Won) e ingreso esperado (número). Luego ejecuta esta herramienta.</field>
     </record>
 </odoo>
