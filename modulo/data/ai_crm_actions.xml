@@ -72,13 +72,16 @@ result = env['ai.crm.actions'].create_opportunity(
 )
         </field>
         <field name="use_in_ai">True</field>
-        <field name="ai_tool_description">Crea una oportunidad CRM con nombre, cliente, email, teléfono, etapa e ingreso esperado</field>
-        <field name="ai_action_prompt">Cuando el usuario pide crear una oportunidad, SIEMPRE extrae ESTOS 6 PARÁMETROS OBLIGATORIOS:
-- name: nombre de la oportunidad
-- customer_name: nombre del cliente
-- email: email
-- phone: teléfono
-- stage_name: etapa (New, Qualified, Proposition, Won)
-- expected_revenue: número del ingreso esperado</field>
+        <field name="ai_tool_description">Crea una oportunidad</field>
+        <field name="ai_action_prompt">Crea una oportunidad en el CRM</field>
+        <field name="ai_param_spec">[
+            {"name": "name", "type": "char", "required": true, "description": "Nombre de la oportunidad"},
+            {"name": "customer_name", "type": "char", "required": false, "description": "Nombre del cliente"},
+            {"name": "email", "type": "char", "required": false, "description": "Email del cliente"},
+            {"name": "phone", "type": "char", "required": false, "description": "Teléfono"},
+            {"name": "stage_name", "type": "char", "required": false, "description": "Etapa: New, Qualified, Proposition, Won"},
+            {"name": "expected_revenue", "type": "float", "required": false, "description": "Ingreso esperado"}
+        ]</field>
     </record>
+
 </odoo>
