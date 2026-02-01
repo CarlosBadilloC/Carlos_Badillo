@@ -65,5 +65,23 @@ result = env['ai.inventory.actions'].search_product_by_category(category_name)
         <field name="ai_tool_description">Busca productos por categoría especificada</field>
         <field name="ai_action_prompt">Cuando el usuario pregunta por productos de una categoría, usa esta herramienta</field>
     </record>
-    
+
+    <record id="ai_action_create_opportunity" model="ir.actions.server">
+        <field name="name">Crear Oportunidad</field>
+        <field name="model_id" ref="crm.model_crm_lead"/>
+        <field name="state">code</field>
+        <field name="code">
+result = env['ai.crm.actions'].create_opportunity(
+    name,
+    customer_name,
+    email,
+    phone,
+    stage_name,
+    expected_revenue
+)
+        </field>
+        <field name="use_in_ai">True</field>
+        <field name="ai_tool_description">Crea una oportunidad con nombre, cliente, email, teléfono, etapa e ingreso esperado</field>
+        <field name="ai_action_prompt">Cuando el usuario pide crear una oportunidad, usa esta herramienta</field>
+    </record>
 </odoo>
