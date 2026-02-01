@@ -1,8 +1,11 @@
 <odoo>
     <record id="inventory_ai_agent" model="ai.agent">
-        <field name="name">AI Inventario</field>
+        <field name="name">AI Asistente Integral</field>
         <field name="active">True</field>
-        <field name="system_prompt">Eres un asistente especializado en gestión de inventario. Tu rol es ayudar a los usuarios a consultar la disponibilidad de productos, verificar niveles de stock, y proporcionar información sobre precios y disponibilidad. Siempre responde de manera clara y precisa basándote en los datos actuales del inventario.</field>
+        <field name="system_prompt">Eres un asistente especializado en gestión de inventario y CRM. Tu rol es ayudar a los usuarios a:
+1. Consultar disponibilidad de productos, verificar niveles de stock, y proporcionar información sobre precios
+2. Gestionar leads y oportunidades, consultar pipeline, crear y buscar registros CRM
+Siempre responde de manera clara y precisa basándote en los datos actuales del sistema.</field>
         <field name="response_style">balanced</field>
         <field name="restrict_to_sources">False</field>
     </record>
