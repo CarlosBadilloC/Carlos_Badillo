@@ -1,3 +1,4 @@
+  <odoo>
     <record id="ai_action_create_opportunity" model="ir.actions.server">
         <field name="name">Crear Oportunidad</field>
         <field name="model_id" ref="crm.model_crm_lead"/>
@@ -35,3 +36,4 @@ result = env['ai.crm.actions'].create_opportunity(
 - expected_revenue: número sin caracteres especiales (ej: 10000)
 Luego ejecuta esta herramienta con los 6 parámetros.</field>
     </record>
+</odoo>
