@@ -1,68 +1,37 @@
-<odoo>
-    <record id="ai_action_get_lead_info" model="ir.actions.server">
-        <field name="name">Obtener Lead/Oportunidad</field>
-        <field name="model_id" ref="crm.model_crm_lead"/>
-        <field name="state">code</field>
-        <field name="code">
-result = env['ai.crm.actions'].get_lead_info(lead_name)
-        </field>
-        <field name="use_in_ai">True</field>
-        <field name="ai_tool_description">Consulta información de un lead u oportunidad por nombre</field>
-        <field name="ai_action_prompt">Cuando el usuario pide información de un lead u oportunidad, extrae el nombre y usa esta herramienta</field>
-    </record>
-
-    <record id="ai_action_list_open_opportunities" model="ir.actions.server">
-        <field name="name">Listar Oportunidades Abiertas</field>
-        <field name="model_id" ref="crm.model_crm_lead"/>
-        <field name="state">code</field>
-        <field name="code">
-result = env['ai.crm.actions'].list_open_opportunities(limit or 10)
-        </field>
-        <field name="use_in_ai">True</field>
-        <field name="ai_tool_description">Lista oportunidades abiertas con probabilidad y valor esperado</field>
-        <field name="ai_action_prompt">Cuando el usuario pide oportunidades abiertas o pipeline abierto, usa esta herramienta</field>
-    </record>
-
-    <record id="ai_action_pipeline_summary" model="ir.actions.server">
-        <field name="name">Resumen del Pipeline</field>
-        <field name="model_id" ref="crm.model_crm_lead"/>
-        <field name="state">code</field>
-        <field name="code">
-result = env['ai.crm.actions'].get_pipeline_summary()
-        </field>
-        <field name="use_in_ai">True</field>
-        <field name="ai_tool_description">Resume el pipeline por etapa con conteo y valor total</field>
-        <field name="ai_action_prompt">Cuando el usuario pide un resumen del pipeline o estado de etapas, usa esta herramienta</field>
-    </record>
-
-    <record id="ai_action_search_leads_by_stage" model="ir.actions.server">
-        <field name="name">Buscar Leads por Etapa</field>
-        <field name="model_id" ref="crm.model_crm_lead"/>
-        <field name="state">code</field>
-        <field name="code">
-result = env['ai.crm.actions'].search_leads_by_stage(stage_name)
-        </field>
-        <field name="use_in_ai">True</field>
-        <field name="ai_tool_description">Busca leads u oportunidades por etapa especificada</field>
-        <field name="ai_action_prompt">Cuando el usuario pregunta por leads en una etapa específica, extrae el nombre de la etapa y usa esta herramienta</field>
-    </record>
-
     <record id="ai_action_create_opportunity" model="ir.actions.server">
         <field name="name">Crear Oportunidad</field>
         <field name="model_id" ref="crm.model_crm_lead"/>
         <field name="state">code</field>
         <field name="code">
+from datetime import datetime
+try:
+    # Convertir expected_revenue a float si es string
+    exp_rev = 0.0
+    if expected_revenue:
+        if isinstance(expected_revenue, str):
+            exp_rev = float(''.join(c for c in expected_revenue if c.isdigit() or c == '.'))
+        else:
+            exp_rev = float(expected_revenue)
+except:
+    exp_rev = 0.0
+
 result = env['ai.crm.actions'].create_opportunity(
     name=name,
     customer_name=customer_name,
     email=email,
     phone=phone,
     stage_name=stage_name,
-    expected_revenue=float(expected_revenue) if expected_revenue else 0.0
+    expected_revenue=exp_rev
 )
         </field>
         <field name="use_in_ai">True</field>
-        <field name="ai_tool_description">Crea una oportunidad. Requiere: nombre (name), cliente (customer_name), email, teléfono (phone), etapa (stage_name), ingreso esperado (expected_revenue)</field>
-        <field name="ai_action_prompt">Cuando el usuario pide crear una oportunidad, extrae estos parámetros: nombre de la oportunidad, nombre del cliente, email, teléfono, nombre de la etapa (ej: Qualified, New, Proposition, Won) e ingreso esperado (número). Luego ejecuta esta herramienta.</field>
+        <field name="ai_tool_description">Crea una oportunidad CRM con nombre, cliente, email, teléfono, etapa e ingreso esperado</field>
+        <field name="ai_action_prompt">Cuando el usuario pide crear una oportunidad, SIEMPRE extrae ESTOS 6 PARÁMETROS OBLIGATORIOS del texto:
+- name: nombre de la oportunidad (ej: 'Proyecto Web')
+- customer_name: nombre del cliente (ej: 'Acme Corp')
+- email: email del cliente (ej: 'info@acme.com')
+- phone: teléfono (ej: '5551234')
+- stage_name: nombre de la etapa EXACTA en el sistema: 'New', 'Qualified', 'Proposition', o 'Won'
+- expected_revenue: número sin caracteres especiales (ej: 10000)
+Luego ejecuta esta herramienta con los 6 parámetros.</field>
     </record>
-</odoo>
