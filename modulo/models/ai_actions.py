@@ -6,31 +6,61 @@ class AIInventoryActions(models.AbstractModel):
 
     @api.model
     def get_stock(self, product_name):
-        """Obtiene información del stock de productos"""
+        """Obtiene información detallada del stock de productos incluyendo marca"""
         products = self.env['product.product'].sudo().search([
             ('name', 'ilike', product_name)
-        ], limit=5)
+        ], limit=10)
 
         if not products:
-            return f"No se encontraron productos llamados '{product_name}'."
+            return f"No se encontraron productos relacionados con '{product_name}'."
 
         result = []
         for p in products:
             status = "✅ Disponible" if p.qty_available > 0 else "❌ Sin stock"
+            marca = p.product_tmpl_id.brand_id.name if hasattr(p.product_tmpl_id, 'brand_id') and p.product_tmpl_id.brand_id else "Sin marca"
+            categoria = p.categ_id.name if p.categ_id else "Sin categoría"
+            
             result.append(
                 f"📦 {p.name}\n"
+                f"  • Marca: {marca}\n"
+                f"  • Categoría: {categoria}\n"
                 f"  • Stock: {int(p.qty_available)} unidades\n"
-                f"  • Precio: ${p.list_price}\n"
+                f"  • Precio: ${p.list_price:,.2f}\n"
                 f"  • Estado: {status}"
             )
         
         return "\n\n".join(result)
 
     @api.model
+    def search_products_by_keyword(self, keyword, limit=10):
+        """Busca productos por palabra clave en nombre, descripción o categoría"""
+        products = self.env['product.product'].sudo().search([
+            '|', '|',
+            ('name', 'ilike', keyword),
+            ('description', 'ilike', keyword),
+            ('categ_id.name', 'ilike', keyword)
+        ], limit=limit)
+        
+        if not products:
+            return f"No se encontraron productos relacionados con '{keyword}'."
+        
+        result = [f"🔍 Productos encontrados para '{keyword}':\n"]
+        for p in products:
+            stock_status = "✅" if p.qty_available > 0 else "❌"
+            marca = p.product_tmpl_id.brand_id.name if hasattr(p.product_tmpl_id, 'brand_id') and p.product_tmpl_id.brand_id else "Sin marca"
+            result.append(
+                f"{stock_status} {p.name}\n"
+                f"    Marca: {marca} | Stock: {int(p.qty_available)} unidades | Precio: ${p.list_price:,.2f}"
+            )
+        
+        return "\n".join(result)
+
+    @api.model
     def check_low_stock(self, threshold=10):
         """Verifica productos con stock bajo"""
         products = self.env['product.product'].sudo().search([
-            ('qty_available', '<', threshold)
+            ('qty_available', '<', threshold),
+            ('qty_available', '>', 0)
         ], limit=10)
         
         if not products:
@@ -54,11 +84,12 @@ class AIInventoryActions(models.AbstractModel):
         return f"""📊 Resumen de Inventario:
   • Total de productos: {total_products}
   • Productos disponibles: {products_in_stock}
+  • Productos sin stock: {total_products - products_in_stock}
   • Valor total: ${total_value:,.2f}"""
 
     @api.model
     def search_product_by_category(self, category_name):
-        """Busca productos por categoría"""
+        """Busca productos por categoría con información detallada"""
         categories = self.env['product.category'].sudo().search([
             ('name', 'ilike', category_name)
         ])
@@ -68,13 +99,18 @@ class AIInventoryActions(models.AbstractModel):
         
         products = self.env['product.product'].sudo().search([
             ('categ_id', 'in', categories.ids)
-        ], limit=10)
+        ], limit=15)
         
         if not products:
             return f"No hay productos en la categoría '{category_name}'."
         
-        result = [f"Productos en '{category_name}':"]
+        result = [f"📁 Productos en '{category_name}':\n"]
         for p in products:
-            result.append(f"  • {p.name}: {int(p.qty_available)} unidades")
+            stock_status = "✅" if p.qty_available > 0 else "❌"
+            marca = p.product_tmpl_id.brand_id.name if hasattr(p.product_tmpl_id, 'brand_id') and p.product_tmpl_id.brand_id else "Sin marca"
+            result.append(
+                f"{stock_status} {p.name}\n"
+                f"    Marca: {marca} | Stock: {int(p.qty_available)} unidades | Precio: ${p.list_price:,.2f}"
+            )
         
         return "\n".join(result)
