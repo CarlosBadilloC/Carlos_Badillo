@@ -64,7 +64,8 @@ result = env['ai.inventory.actions'].check_low_stock(threshold or 10)
       "type": "integer",
       "description": "Umbral de stock bajo (por defecto 10)"
     }
-  }
+  },
+  "required": []
 }</field>
     </record>
 
@@ -78,6 +79,11 @@ result = env['ai.inventory.actions'].get_inventory_summary()
         <field name="use_in_ai">True</field>
         <field name="ai_tool_description">Obtiene un resumen completo del estado del inventario con totales y valores</field>
         <field name="ai_action_prompt">Cuando el usuario pide un resumen o estado general del inventario</field>
+        <field name="ai_tool_schema">{
+  "type": "object",
+  "properties": {},
+  "required": []
+}</field>
     </record>
 
     <record id="ai_action_search_by_category" model="ir.actions.server">
