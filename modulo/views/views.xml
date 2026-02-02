@@ -1,9 +1,5 @@
 <odoo>
   <data>
-    <!-- Configuración del Live Chat -->
-    <record model="mail.channel" id="channel_ai_chat">
-        <field name="name">AI Chat</field>
-        <field name="channel_type">chat</field>
-    </record>
+
   </data>
 </odoo>
