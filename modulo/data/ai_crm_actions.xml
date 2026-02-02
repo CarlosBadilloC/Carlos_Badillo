@@ -126,4 +126,26 @@ result = env['ai.crm.actions'].create_opportunity(
 }</field>
     </record>
 
+    <record id="ai_action_search_quotations_with_stock" model="ir.actions.server">
+        <field name="name">Buscar Cotizaciones con Stock</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="state">code</field>
+        <field name="code">
+result = env['ai.crm.actions'].search_quotations_with_stock(product_name)
+        </field>
+        <field name="use_in_ai">True</field>
+        <field name="ai_tool_description">Busca cotizaciones que contengan un producto específico y muestra el stock disponible para cada producto cotizado</field>
+        <field name="ai_action_prompt">Cuando el usuario pregunta por cotizaciones de productos (ej: '¿existe cotización para pelotas?', '¿hay presupuesto de balones?'), usa esta herramienta</field>
+        <field name="ai_tool_schema">{
+  "type": "object",
+  "properties": {
+    "product_name": {
+      "type": "string",
+      "description": "Nombre o categoría del producto a buscar en cotizaciones"
+    }
+  },
+  "required": ["product_name"]
+}</field>
+    </record>
+
 </odoo>

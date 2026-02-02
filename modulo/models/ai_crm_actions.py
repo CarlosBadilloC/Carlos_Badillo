@@ -203,3 +203,65 @@ class AICrmActions(models.AbstractModel):
             f"  • Etapa: {stage_label}\n"
             f"  • Ingreso esperado: ${lead.expected_revenue:,.2f}"
         )
+    @api.model
+    def search_quotations_with_stock(self, product_name):
+        """Busca cotizaciones que contengan un producto y muestra stock disponible"""
+        # Buscar productos relacionados
+        products = self.env['product.product'].sudo().search([
+            '|', '|',
+            ('name', 'ilike', product_name),
+            ('description', 'ilike', product_name),
+            ('categ_id.name', 'ilike', product_name)
+        ])
+
+        if not products:
+            return f"❌ No se encontraron productos relacionados con '{product_name}'."
+
+        # Buscar cotizaciones (sale.order en estado draft o sent)
+        quotations = self.env['sale.order'].sudo().search([
+            ('state', 'in', ['draft', 'sent']),
+            ('order_line.product_id', 'in', products.ids)
+        ], limit=10)
+
+        if not quotations:
+            product_names = ', '.join(products.mapped('name')[:3])
+            return f"📋 No se encontraron cotizaciones activas para productos relacionados con '{product_name}' ({product_names})."
+
+        result = [f"📋 Encontré {len(quotations)} cotización(es) para productos relacionados con '{product_name}':\n"]
+
+        for quote in quotations:
+            customer = quote.partner_id.display_name if quote.partner_id else "Sin cliente"
+            state_label = "Borrador" if quote.state == 'draft' else "Enviada"
+            
+            result.append(
+                f"📄 **Cotización {quote.name}**\n"
+                f"  • Cliente: {customer}\n"
+                f"  • Estado: {state_label}\n"
+                f"  • Fecha: {quote.date_order.strftime('%d/%m/%Y')}\n"
+                f"  • Total: ${quote.amount_total:,.2f}\n"
+                f"  • Productos:"
+            )
+
+            # Listar productos de la cotización que coincidan con la búsqueda
+            for line in quote.order_line.filtered(lambda l: l.product_id in products):
+                product = line.product_id
+                qty_quoted = int(line.product_uom_qty)
+                stock_available = int(product.qty_available)
+                
+                # Verificar si hay suficiente stock
+                if stock_available >= qty_quoted:
+                    stock_status = f"✅ Stock suficiente ({stock_available} disponibles)"
+                elif stock_available > 0:
+                    stock_status = f"⚠️ Stock parcial ({stock_available} disponibles de {qty_quoted} requeridos)"
+                else:
+                    stock_status = f"❌ Sin stock ({qty_quoted} requeridos)"
+
+                result.append(
+                    f"    - {product.name}\n"
+                    f"      • Cantidad cotizada: {qty_quoted} unidades\n"
+                    f"      • Precio unitario: ${line.price_unit:,.2f}\n"
+                    f"      • Subtotal: ${line.price_subtotal:,.2f}\n"
+                    f"      • {stock_status}"
+                )
+
+        return "\n\n".join(result)
