@@ -29,7 +29,6 @@ Long description of module's purpose
         'views/views.xml',
         'views/templates.xml',
         'views/res_config_settings_views.xml',
-        'controllers/chat_controller.py',
     ],
     # only loaded in demonstration mode
     'demo': [
