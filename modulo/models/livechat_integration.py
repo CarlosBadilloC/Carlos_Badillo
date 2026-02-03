@@ -21,18 +21,34 @@ class LivechatIntegration(models.Model):
     def _call_ai_agent(self, ai_agent, prompt):
         """Llama al agente IA y obtiene respuesta"""
         try:
-            if 'stock' in prompt.lower() or 'producto' in prompt.lower():
+            prompt_lower = prompt.lower()
+            
+            # Palabras clave para cada sección
+            inventory_keywords = ['stock', 'producto', 'disponible', 'inventario', 'catálogo', 'precio', 'cantidad', 'unidades']
+            crm_keywords = ['lead', 'oportunidad', 'cliente', 'cotización', 'presupuesto', 'venta', 'pipeline', 'etapa']
+            
+            # Contar coincidencias de palabras clave
+            inventory_matches = sum(1 for kw in inventory_keywords if kw in prompt_lower)
+            crm_matches = sum(1 for kw in crm_keywords if kw in prompt_lower)
+            
+            # Priorizar según coincidencias
+            if inventory_matches > crm_matches:
                 return self.env['ai.inventory.actions'].search_products_detailed(prompt)
-            elif 'lead' in prompt.lower() or 'oportunidad' in prompt.lower():
-                return self.env['ai.crm.actions'].get_lead_info(prompt)
-            elif 'cotizacion' in prompt.lower() or 'presupuesto' in prompt.lower():
-                return self.env['ai.crm.actions'].search_quotations_with_stock(prompt)
-            elif 'pipeline' in prompt.lower() or 'resumen' in prompt.lower():
-                return self.env['ai.crm.actions'].get_pipeline_summary()
-            elif 'inventario' in prompt.lower() or 'resumen' in prompt.lower():
-                return self.env['ai.inventory.actions'].get_inventory_summary()
+            elif crm_matches > inventory_matches:
+                if 'cotización' in prompt_lower or 'presupuesto' in prompt_lower:
+                    return self.env['ai.crm.actions'].search_quotations_with_stock(prompt)
+                elif 'pipeline' in prompt_lower or 'resumen' in prompt_lower:
+                    return self.env['ai.crm.actions'].get_pipeline_summary()
+                else:
+                    return self.env['ai.crm.actions'].get_lead_info(prompt)
             else:
-                return "¿En qué puedo ayudarte? Puedo consultar inventario, gestionar leads u oportunidades."
+                # Si no hay coincidencias claras, intentar búsqueda de inventario primero
+                result = self.env['ai.inventory.actions'].search_products_detailed(prompt)
+                if '❌ No se encontraron' in result:
+                    # Si no hay productos, intentar con CRM
+                    return self.env['ai.crm.actions'].list_open_opportunities()
+                return result
+                
         except Exception as e:
             _logger.error(f"Error llamando agente IA: {e}")
             return f"Disculpa, ocurrió un error procesando tu solicitud."
