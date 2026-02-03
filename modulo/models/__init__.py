@@ -3,4 +3,3 @@ from . import ai_actions
 from . import ai_crm_actions
 from . import res_config_settings
 from . import livechat_integration
-from . import mail_channel_override

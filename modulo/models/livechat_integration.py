@@ -14,28 +14,19 @@ class LivechatIntegration(models.Model):
     livechat_channel_id = fields.Many2one(
         'im_livechat.channel',
         string="Canal Livechat",
-        required=False  # Hacer opcional para evitar errores de dependencias
+        required=False
     )
     
     @api.model
     def _process_livechat_message(self, mail_channel, message_body, author):
         """Procesa mensajes de livechat y envía respuesta del agente IA"""
         try:
-            # Obtener la integración activa
             integration = self.search([('active', '=', True)], limit=1)
-            if not integration:
-                _logger.warning("No hay integración IA activa para livechat")
+            if not integration or not integration.ai_agent_id:
                 return
 
-            # Obtener el agente IA
-            ai_agent = integration.ai_agent_id
-            if not ai_agent:
-                return
+            result = self._call_ai_agent(integration.ai_agent_id, message_body)
 
-            # Llamar al agente IA con el mensaje del usuario
-            result = self._call_ai_agent(ai_agent, message_body)
-
-            # Enviar respuesta al canal de livechat
             if result:
                 try:
                     mail_channel.message_post(
@@ -53,7 +44,6 @@ class LivechatIntegration(models.Model):
     def _call_ai_agent(self, ai_agent, prompt):
         """Llama al agente IA y obtiene respuesta"""
         try:
-            # Dependiendo del tipo de pregunta, llamar a las acciones correspondientes
             if 'stock' in prompt.lower() or 'producto' in prompt.lower():
                 return self.env['ai.inventory.actions'].search_products_detailed(prompt)
             elif 'lead' in prompt.lower() or 'oportunidad' in prompt.lower():
@@ -63,8 +53,50 @@ class LivechatIntegration(models.Model):
             elif 'pipeline' in prompt.lower() or 'resumen' in prompt.lower():
                 return self.env['ai.crm.actions'].get_pipeline_summary()
             else:
-                # Respuesta genérica si no se identifica la acción
                 return "¿En qué puedo ayudarte? Puedo consultar inventario, gestionar leads u oportunidades."
         except Exception as e:
             _logger.error(f"Error llamando agente IA: {e}")
             return f"Disculpa, ocurrió un error procesando tu solicitud."
+
+
+class MailChannelMixin(models.AbstractModel):
+    """Mixin para extender mail.channel sin heredar directamente"""
+    _name = "mail.channel.ai.mixin"
+    _description = "Mixin para integración IA con Livechat"
+
+    @api.model
+    def init(self):
+        """Hook que se ejecuta después de que mail.channel está registrado"""
+        super().init()
+        self._patch_mail_channel()
+
+    @api.model
+    def _patch_mail_channel(self):
+        """Parchea mail.channel para procesar mensajes con IA"""
+        MailChannel = self.env.get('mail.channel')
+        if not MailChannel:
+            return
+
+        original_message_post = MailChannel.message_post
+
+        def message_post_with_ai(self, **kwargs):
+            result = original_message_post(self, **kwargs)
+            
+            try:
+                if hasattr(self, 'livechat_channel_id') and self.livechat_channel_id:
+                    message_body = kwargs.get('body', '')
+                    author_id = kwargs.get('author_id')
+                    
+                    if author_id and author_id != self.env.ref('base.partner_root').id:
+                        integration = self.env['livechat.ai.integration'].search(
+                            [('active', '=', True)],
+                            limit=1
+                        )
+                        if integration:
+                            integration._process_livechat_message(self, message_body, author_id)
+            except Exception as e:
+                _logger.warning(f"Error en integración livechat: {e}")
+            
+            return result
+
+        MailChannel.message_post = message_post_with_ai
