@@ -2,13 +2,23 @@
     'name': "Agente AI",
     'summary': "Asistente IA para control de inventario y crm",
     'description': """
-Long description of module's purpose
+Módulo de integración de IA para control de inventario y CRM con soporte para livechat
     """,
     'author': "My Company",
     'website': "https://www.yourcompany.com",
     'category': 'Uncategorized',
     'version': '0.1',
-    'depends': ['base','mail','product','stock','ai','crm','sale','website','im_livechat'],
+    'depends': [
+        'base',
+        'mail',
+        'product',
+        'stock',
+        'ai',
+        'crm',
+        'sale',
+        'website',
+        'im_livechat'
+    ],
     'data': [
         'data/ai_actions.xml',
         'data/ai_crm_actions.xml',
@@ -23,5 +33,6 @@ Long description of module's purpose
         'demo/demo.xml',
     ],
     'installable': True,
+    'auto_install': False,
     'license': 'LGPL-3',
 }
