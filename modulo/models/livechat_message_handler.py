@@ -1,6 +1,6 @@
-from odoo import models, api, fields
-from odoo.addons.bus.models.bus import json_dump
+from odoo import models, api
 import logging
+import re
 
 _logger = logging.getLogger(__name__)
 
@@ -14,14 +14,15 @@ class MailMessage(models.Model):
         
         for record in records:
             try:
-                # Verificar si es un mensaje de livechat
-                if record.model == 'mail.channel' and record.res_id:
-                    channel = self.env['mail.channel'].browse(record.res_id)
+                # Verificar si es un mensaje de discuss.channel (Odoo 19)
+                if record.model == 'discuss.channel' and record.res_id:
+                    channel = self.env['discuss.channel'].browse(record.res_id)
                     
                     # Verificar si el canal tiene livechat_channel_id
                     if hasattr(channel, 'livechat_channel_id') and channel.livechat_channel_id:
                         # Solo procesar mensajes de usuarios (no del bot)
-                        if record.author_id and record.author_id != self.env.ref('base.partner_root'):
+                        bot_partner = self.env.ref('base.partner_root', raise_if_not_found=False)
+                        if record.author_id and (not bot_partner or record.author_id != bot_partner):
                             self._process_livechat_ai_response(channel, record)
             except Exception as e:
                 _logger.warning(f"Error procesando mensaje livechat: {e}")
@@ -39,27 +40,34 @@ class MailMessage(models.Model):
             )
             
             if not integration or not integration.ai_agent_id:
+                _logger.info("No hay integración IA activa")
                 return
 
             # Procesar el mensaje del usuario
-            message_body = message.body
-            # Limpiar HTML si es necesario
+            message_body = message.body or ''
+            
+            # Limpiar HTML
             if '<' in message_body:
-                import re
-                message_body = re.sub('<[^<]+?>', '', message_body)
+                message_body = re.sub('<[^<]+?>', '', message_body).strip()
+
+            if not message_body:
+                return
+
+            _logger.info(f"Procesando mensaje de livechat: {message_body[:50]}...")
 
             # Obtener respuesta del agente IA
             response = integration._call_ai_agent(integration.ai_agent_id, message_body)
 
             if response:
                 # Enviar respuesta del bot automáticamente
+                bot_partner = self.env.ref('base.partner_root', raise_if_not_found=False)
                 channel.message_post(
                     body=response,
                     message_type='comment',
                     subtype_xmlid='mail.mt_comment',
-                    author_id=self.env.ref('base.partner_root').id
+                    author_id=bot_partner.id if bot_partner else False
                 )
                 
-                _logger.info(f"Respuesta IA enviada al canal {channel.name}")
+                _logger.info(f"✅ Respuesta IA enviada al canal {channel.name}")
         except Exception as e:
-            _logger.error(f"Error procesando respuesta IA: {e}")
+            _logger.error(f"❌ Error procesando respuesta IA: {e}", exc_info=True)
