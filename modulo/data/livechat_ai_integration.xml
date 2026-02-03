@@ -1,0 +1,8 @@
+<odoo>
+    <record id="livechat_ai_integration_default" model="livechat.ai.integration">
+        <field name="name">AI Agent - Livechat Integration</field>
+        <field name="active">True</field>
+        <field name="ai_agent_id" ref="modulo.inventory_ai_agent"/>
+        <field name="livechat_channel_id" ref="im_livechat.default_livechat_channel"/>
+    </record>
+</odoo>
