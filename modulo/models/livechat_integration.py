@@ -16,29 +16,6 @@ class LivechatIntegration(models.Model):
         string="Canal Livechat",
         required=False
     )
-    
-    @api.model
-    def _process_livechat_message(self, mail_channel, message_body, author):
-        """Procesa mensajes de livechat y envía respuesta del agente IA"""
-        try:
-            integration = self.search([('active', '=', True)], limit=1)
-            if not integration or not integration.ai_agent_id:
-                return
-
-            result = self._call_ai_agent(integration.ai_agent_id, message_body)
-
-            if result:
-                try:
-                    mail_channel.message_post(
-                        body=result,
-                        message_type='comment',
-                        subtype_xmlid='mail.mt_comment',
-                        author_id=self.env.ref('base.partner_root').id
-                    )
-                except Exception as e:
-                    _logger.error(f"Error al enviar mensaje a livechat: {e}")
-        except Exception as e:
-            _logger.error(f"Error procesando mensaje de livechat: {e}")
 
     @api.model
     def _call_ai_agent(self, ai_agent, prompt):
@@ -52,51 +29,10 @@ class LivechatIntegration(models.Model):
                 return self.env['ai.crm.actions'].search_quotations_with_stock(prompt)
             elif 'pipeline' in prompt.lower() or 'resumen' in prompt.lower():
                 return self.env['ai.crm.actions'].get_pipeline_summary()
+            elif 'inventario' in prompt.lower() or 'resumen' in prompt.lower():
+                return self.env['ai.inventory.actions'].get_inventory_summary()
             else:
                 return "¿En qué puedo ayudarte? Puedo consultar inventario, gestionar leads u oportunidades."
         except Exception as e:
             _logger.error(f"Error llamando agente IA: {e}")
             return f"Disculpa, ocurrió un error procesando tu solicitud."
-
-
-class MailChannelMixin(models.AbstractModel):
-    """Mixin para extender mail.channel sin heredar directamente"""
-    _name = "mail.channel.ai.mixin"
-    _description = "Mixin para integración IA con Livechat"
-
-    @api.model
-    def init(self):
-        """Hook que se ejecuta después de que mail.channel está registrado"""
-        super().init()
-        self._patch_mail_channel()
-
-    @api.model
-    def _patch_mail_channel(self):
-        """Parchea mail.channel para procesar mensajes con IA"""
-        MailChannel = self.env.get('mail.channel')
-        if not MailChannel:
-            return
-
-        original_message_post = MailChannel.message_post
-
-        def message_post_with_ai(self, **kwargs):
-            result = original_message_post(self, **kwargs)
-            
-            try:
-                if hasattr(self, 'livechat_channel_id') and self.livechat_channel_id:
-                    message_body = kwargs.get('body', '')
-                    author_id = kwargs.get('author_id')
-                    
-                    if author_id and author_id != self.env.ref('base.partner_root').id:
-                        integration = self.env['livechat.ai.integration'].search(
-                            [('active', '=', True)],
-                            limit=1
-                        )
-                        if integration:
-                            integration._process_livechat_message(self, message_body, author_id)
-            except Exception as e:
-                _logger.warning(f"Error en integración livechat: {e}")
-            
-            return result
-
-        MailChannel.message_post = message_post_with_ai
