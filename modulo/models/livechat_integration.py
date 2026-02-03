@@ -100,7 +100,7 @@ class LivechatIntegration(models.Model):
                     "  • Buscar leads por etapa (ej: 'leads en qualified')\n"
                     "  • Ver resumen del pipeline (ej: 'resumen del pipeline')\n"
                     "  • Crear nuevas oportunidades (ej: 'crear oportunidad para cliente X')\n"
-                    "  • Consultar cotizaciones (ej: 'cotizaciones de desks')\n\n"
+                    "  • Consultar cotizaciones (ej: 'cotizaciones de pelotas')\n\n"
                     "¿En qué puedo ayudarte?"
                 )
                 
@@ -110,25 +110,21 @@ class LivechatIntegration(models.Model):
 
     @api.model
     def _extract_product_from_prompt(self, prompt):
-        """Extrae nombre de producto del prompt de forma más inteligente"""
-        # Eliminar palabras de pregunta/contexto, pero mantener el resto
-        stopwords = [
-            '¿', '?', 'existe', 'hay', 'alguna', 'algún', 'muéstrame', 'dame', 
-            'verifica', 'para', 'con', 'en', 'el', 'la', 'los', 'las',
-            'cotización', 'cotizacion', 'cotizaciones', 'presupuesto', 'quote', 'quotes'
-        ]
+        """Extrae nombre de producto del prompt usando regex con límites de palabra"""
+        # Patrón regex para eliminar palabras COMPLETAS (con \b = límites de palabra)
+        stopwords_pattern = r'\b(existe|hay|alguna|algún|muéstrame|dame|verifica|para|con|en|el|la|los|las|de|del|cotización|cotizacion|cotizaciones|presupuesto|presupuestos|quote|quotes)\b'
         
-        # Limpiar el prompt
-        cleaned = prompt.lower()
-        for word in stopwords:
-            cleaned = cleaned.replace(word, ' ')
+        # Limpiar caracteres especiales primero
+        cleaned = re.sub(r'[¿?¡!,;]', '', prompt.lower())
         
-        # Eliminar caracteres especiales y espacios múltiples
-        cleaned = re.sub(r'[¿?¡!,;]', '', cleaned)
+        # Eliminar stopwords usando regex (palabras completas)
+        cleaned = re.sub(stopwords_pattern, '', cleaned, flags=re.IGNORECASE)
+        
+        # Eliminar espacios múltiples y trim
         cleaned = re.sub(r'\s+', ' ', cleaned).strip()
         
-        # Tomar las primeras palabras significativas
-        words = [w for w in cleaned.split() if len(w) > 2]
+        # Tomar las primeras palabras significativas (mínimo 2 caracteres)
+        words = [w for w in cleaned.split() if len(w) > 1]
         result = ' '.join(words[:5]) if words else 'producto'
         
         _logger.info(f"Producto extraído de '{prompt}': '{result}'")
