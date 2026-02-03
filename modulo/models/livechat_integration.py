@@ -1,5 +1,4 @@
 from odoo import models, api, fields
-from odoo.addons.mail.models.mail_message import Message
 import logging
 
 _logger = logging.getLogger(__name__)
