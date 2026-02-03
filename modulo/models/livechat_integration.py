@@ -24,8 +24,6 @@ class LivechatIntegration(models.Model):
         try:
             prompt_lower = prompt.lower()
             
-            # Detectar intención específica con patrones más precisos
-            
             # 1. COTIZACIONES - Máxima prioridad
             if re.search(r'cotizacion|cotización|presupuesto|quote', prompt_lower):
                 product_name = self._extract_product_from_prompt(prompt)
@@ -83,13 +81,12 @@ class LivechatIntegration(models.Model):
                 _logger.info(f"🔍 Detectado: Información de lead/oportunidad '{lead_name}'")
                 return self.env['ai.crm.actions'].get_lead_info(lead_name)
             
-            # 10. BÚSQUEDA DE PRODUCTOS (Por defecto para "busco", "productos", "stock")
+            # 10. BÚSQUEDA DE PRODUCTOS
             elif re.search(r'busco|search|productos|products|stock|inventario', prompt_lower):
                 _logger.info(f"🔍 Detectado: Búsqueda general de productos")
                 return self.env['ai.inventory.actions'].search_products_detailed(prompt)
             
             else:
-                # Respuesta por defecto si no se identifica la acción
                 _logger.info(f"🔍 No se detectó intención clara, mostrando menú de ayuda")
                 return (
                     "👋 Hola, soy tu asistente de IA. Puedo ayudarte con:\n\n"
@@ -113,11 +110,28 @@ class LivechatIntegration(models.Model):
 
     @api.model
     def _extract_product_from_prompt(self, prompt):
-        """Extrae nombre de producto del prompt"""
-        stopwords = ['para', 'de', 'del', 'la', 'el', 'productos', 'y', 'muéstrame', 'dame', 'verifica', 'disponible', 'stock', 'cotización', 'cotizaciones', 'presupuesto', 'quote', 'en', 'el', 'la']
-        words = [w for w in prompt.split() if w.lower() not in stopwords and len(w) > 2]
-        result = ' '.join(words[:4]) if words else 'producto'
-        _logger.info(f"Producto extraído: '{result}'")
+        """Extrae nombre de producto del prompt de forma más inteligente"""
+        # Eliminar palabras de pregunta/contexto, pero mantener el resto
+        stopwords = [
+            '¿', '?', 'existe', 'hay', 'alguna', 'algún', 'muéstrame', 'dame', 
+            'verifica', 'para', 'con', 'en', 'el', 'la', 'los', 'las',
+            'cotización', 'cotizacion', 'cotizaciones', 'presupuesto', 'quote', 'quotes'
+        ]
+        
+        # Limpiar el prompt
+        cleaned = prompt.lower()
+        for word in stopwords:
+            cleaned = cleaned.replace(word, ' ')
+        
+        # Eliminar caracteres especiales y espacios múltiples
+        cleaned = re.sub(r'[¿?¡!,;]', '', cleaned)
+        cleaned = re.sub(r'\s+', ' ', cleaned).strip()
+        
+        # Tomar las primeras palabras significativas
+        words = [w for w in cleaned.split() if len(w) > 2]
+        result = ' '.join(words[:5]) if words else 'producto'
+        
+        _logger.info(f"Producto extraído de '{prompt}': '{result}'")
         return result
 
     @api.model
@@ -148,7 +162,6 @@ class LivechatIntegration(models.Model):
     @api.model
     def _extract_lead_name_from_prompt(self, prompt):
         """Extrae nombre del lead/oportunidad del prompt"""
-        # Eliminar palabras clave y quedarse con el resto
         cleaned = re.sub(r'(información|info|detalles|details|dame|tell\s+me|lead|oportunidad|opportunity|del?|de|la)', '', prompt, flags=re.IGNORECASE).strip()
         _logger.info(f"Lead/Oportunidad extraída: '{cleaned}'")
         return cleaned or 'lead'
@@ -165,22 +178,18 @@ class LivechatIntegration(models.Model):
             'expected_revenue': 0.0
         }
         
-        # Buscar nombre entre comillas
         name_match = re.search(r'"([^"]+)"', prompt)
         if name_match:
             data['name'] = name_match.group(1)
         
-        # Buscar email
         email_match = re.search(r'([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})', prompt)
         if email_match:
             data['email'] = email_match.group(1)
         
-        # Buscar cliente
         client_match = re.search(r'(?:cliente|customer|para)\s+"?([^"\n,]+)"?', prompt, re.IGNORECASE)
         if client_match:
             data['customer_name'] = client_match.group(1).strip()
         
-        # Asignar nombre si no existe
         if not data['name'] and data['customer_name']:
             data['name'] = f"Oportunidad para {data['customer_name']}"
         elif not data['name']:
