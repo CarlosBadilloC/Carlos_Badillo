@@ -1,15 +1,20 @@
 # Carlos_Badillo
 
 Agente IA para Odoo 19
+
+
 <img src="https://img.shields.io/badge/Odoo-19.0-blue.svg" alt="Odoo Version">
 
 <img src="https://img.shields.io/badge/Python-3.10+-green.svg" alt="Python">
 
 <img src="https://img.shields.io/badge/License-LGPL--3-purple.svg" alt="License">
 
+
 Módulo de integración de Inteligencia Artificial para Odoo 19 que proporciona un asistente virtual especializado en gestión de inventario y CRM con soporte para LiveChat.
 
 📋 Tabla de Contenidos
+
+
 Características
 Requisitos
 Instalación
@@ -21,7 +26,12 @@ Ejemplos
 Solución de Problemas
 Contribuir
 Licencia
+
+
+
 🚀 Características
+
+
 Gestión de Inventario
 ✅ Consulta de stock en tiempo real
 ✅ Búsqueda inteligente de productos por nombre, descripción o categoría
