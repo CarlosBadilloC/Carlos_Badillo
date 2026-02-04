@@ -82,9 +82,9 @@
 **🧠Versiones**
 
 
-Odoo: 19.0+
-Python: 3.10+
-PostgreSQL: 12+
+- Odoo: 19.0+
+- Python: 3.10+
+- PostgreSQL: 12+
 
 
 
@@ -150,7 +150,7 @@ PostgreSQL: 12+
     2. ⚠️ Stock bajo:
     	Usuario: "productos con stock bajo"
       	Bot: Reporta productos bajo el umbral configurado
-    3 .📦 Consultar stock:
+    3. 📦 Consultar stock:
     	Usuario: "busco sillas de oficina"
       	Bot: Lista todos los productos relacionados con stock y precios
 
