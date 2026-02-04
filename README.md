@@ -116,3 +116,81 @@ PostgreSQL: 12+
     2. Haz clic en Actualizar lista de aplicaciones
     3. Busca "Agente AI"
     4. Haz clic en Instalar
+
+
+
+### ⚙️ Configuración
+- Configurar API Key
+  - Navega a:
+      Configuración → Configuración General → AI Configuration
+
+
+  - AI API Key: [Tu clave de API de Google Gemini/OpenAI]
+    
+- Activar Integración con LiveChat
+  - *Se debe configurar en la página web a utilizar*
+
+
+
+- Configurar Agente IA
+  - El agente "AI Asistente Integral" se crea automáticamente con:
+
+    1. Nombre: AI Asistente Integral
+    2. Estado: Activo
+    3. Estilo de respuesta: Balanced
+    4. System Prompt: Configurado para inventario y CRM
+   
+
+### 📖 Uso
+
+
+- Integración con LiveChat
+  - *El asistente responde automáticamente en LiveChat cuando detecta mensajes de usuarios.*
+
+  - Ejemplos de consultas:
+    1.Usuario: "¿Hay cotizaciones para pelotas?"
+      Bot: Muestra cotizaciones con verificación de stock
+    2. Usuario: "productos con stock bajo"
+      Bot: Reporta productos bajo el umbral configurado
+    3. Usuario: "busco sillas de oficina"
+      Bot: Lista todos los productos relacionados con stock y precios
+
+### 🎯 Funcionalidades
+
+
+**Acciones de Inventario**
+
+
+  | Función| Descripción | Modelo |
+  |----------|-----------|-----------|
+  | get_stock()   | Obtiene stock de productos    | ai.inventory.actions   |
+  |search_products_detailed()   | Búsqueda avanzada con detalles   | ai.inventory.actions   |
+  | check_low_stock()   | Detecta productos con poco stock| ai.inventory.actions    |
+  | get_inventory_summary()   | Resumen completo del inventario   | 	ai.inventory.actions   |
+  | search_product_by_category()  | Búsqueda por categoría    |ai.inventory.actions    |
+
+		
+		
+**Acciones de CRM**
+
+
+  | Función| Descripción | Modelo |
+  |----------|-----------|-----------|
+  | create_opportunity()   |Crea nueva oportunidad   |ai.crm.actions   |
+  |create_lead()   | Crea nuevo lead   | 	ai.crm.actions   |
+  | get_lead_info()  | Obtiene información de lead| ai.crm.actions    |
+  |list_open_opportunities()   | Lista oportunidades abiertas   | 		ai.crm.actions  |
+  | get_pipeline_summary()  | 	Resumen del pipeline    |ai.crm.actions    |
+  |search_quotations_with_stock()  | 	Busca cotizaciones con stock    | ai.crm.actions   |
+
+
+
+
+
+
+		
+	
+		
+	
+	
+	
