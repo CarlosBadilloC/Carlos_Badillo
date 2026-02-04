@@ -160,27 +160,27 @@
 - **Acciones de Inventario**
 
 
-	  | Función| Descripción | Modelo |
-	  |----------|-----------|-----------|
-	  | get_stock()   | Obtiene stock de productos    | ai.inventory.actions   |
-	  |search_products_detailed()   | Búsqueda avanzada con detalles   | ai.inventory.actions   |
-	  | check_low_stock()   | Detecta productos con poco stock| ai.inventory.actions    |
-	  | get_inventory_summary()   | Resumen completo del inventario   | 	ai.inventory.actions   |
-	  | search_product_by_category()  | Búsqueda por categoría    |ai.inventory.actions    |
+	 | Función| Descripción | Modelo |
+	 |----------|-----------|-----------|
+	 | get_stock()   | Obtiene stock de productos    | ai.inventory.actions   |
+	 |search_products_detailed()   | Búsqueda avanzada con detalles   | ai.inventory.actions   |
+	 | check_low_stock()   | Detecta productos con poco stock| ai.inventory.actions    |
+	 | get_inventory_summary()   | Resumen completo del inventario   | 	ai.inventory.actions   |
+	 | search_product_by_category()  | Búsqueda por categoría    |ai.inventory.actions    |
 
 		
 		
 - **Acciones de CRM**
 
 
-	  | Función| Descripción | Modelo |
-	  |----------|-----------|-----------|
-	  | create_opportunity()   |Crea nueva oportunidad   |ai.crm.actions   |
-	  |create_lead()   | Crea nuevo lead   | 	ai.crm.actions   |
-	  | get_lead_info()  | Obtiene información de lead| ai.crm.actions    |
-	  |list_open_opportunities()   | Lista oportunidades abiertas   | 		ai.crm.actions  |
-	  | get_pipeline_summary()  | 	Resumen del pipeline    |ai.crm.actions    |
-	  |search_quotations_with_stock()  | 	Busca cotizaciones con stock    | ai.crm.actions   |
+	 | Función| Descripción | Modelo |
+	 |----------|-----------|-----------|
+	 | create_opportunity()   |Crea nueva oportunidad   |ai.crm.actions   |
+	 |create_lead()   | Crea nuevo lead   | 	ai.crm.actions   |
+	 | get_lead_info()  | Obtiene información de lead| ai.crm.actions    |
+	 |list_open_opportunities()   | Lista oportunidades abiertas   | 		ai.crm.actions  |
+	 | get_pipeline_summary()  | 	Resumen del pipeline    |ai.crm.actions    |
+	 |search_quotations_with_stock()  | 	Busca cotizaciones con stock    | ai.crm.actions   |
 
 
 
