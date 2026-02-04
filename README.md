@@ -202,7 +202,6 @@ PostgreSQL: 12+
   - `ai_actions.xml` → Acciones del agente IA
   - `ai_agent.xml` → Configuración del agente
   - `ai_crm_actions.xml` → Acciones CRM
-  - `ai_agent_source.xml` → Fuentes de datos
   - `livechat_ai_integration.xml` → Integración LiveChat
 
 - **models/**
