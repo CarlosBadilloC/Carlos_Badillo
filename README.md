@@ -95,24 +95,24 @@ PostgreSQL: 12+
 ### 🔧 Instalación
 
 
--Clonar el Repositorio
+- Clonar el Repositorio
 
 
-git clone https://github.com/yourusername/modulo.git
+  - git clone https://github.com/yourusername/modulo.git
 
 
--Instalar Dependencias Python
+- Instalar Dependencias Python
 
 
-pip install -r requirements.txt
+  - pip install -r requirements.txt
 
 
--Actualizar Lista de Aplicaciones
+- Actualizar Lista de Aplicaciones
 
 
-Accede a Odoo:
+  - Accede a Odoo:
 
-1. Ve a Aplicaciones
-2. Haz clic en Actualizar lista de aplicaciones
-3. Busca "Agente AI"
-4. Haz clic en Instalar
+    1. Ve a Aplicaciones
+    2. Haz clic en Actualizar lista de aplicaciones
+    3. Busca "Agente AI"
+    4. Haz clic en Instalar
