@@ -1,0 +1,4 @@
+<odoo>
+    <!-- Las sources en Odoo 19 son para archivos, PDFs, enlaces, no para modelos.
+         Si necesitas conectar datos de producto, usa ai.tool en ir.actions.server -->
+</odoo>

@@ -1,0 +1,151 @@
+<odoo>
+    <record id="ai_action_get_lead_info" model="ir.actions.server">
+        <field name="name">Obtener Lead/Oportunidad</field>
+        <field name="model_id" ref="crm.model_crm_lead"/>
+        <field name="state">code</field>
+        <field name="code">
+result = env['ai.crm.actions'].get_lead_info(lead_name)
+        </field>
+        <field name="use_in_ai">True</field>
+        <field name="ai_tool_description">Consulta información de un lead u oportunidad por nombre</field>
+        <field name="ai_action_prompt">Consulta información de un lead u oportunidad</field>
+        <field name="ai_tool_schema">{
+  "type": "object",
+  "properties": {
+    "lead_name": {
+      "type": "string",
+      "description": "Nombre del lead u oportunidad a buscar"
+    }
+  },
+  "required": ["lead_name"]
+}</field>
+    </record>
+
+    <record id="ai_action_list_open_opportunities" model="ir.actions.server">
+        <field name="name">Listar Oportunidades Abiertas</field>
+        <field name="model_id" ref="crm.model_crm_lead"/>
+        <field name="state">code</field>
+        <field name="code">
+result = env['ai.crm.actions'].list_open_opportunities(limit or 10)
+        </field>
+        <field name="use_in_ai">True</field>
+        <field name="ai_tool_description">Lista oportunidades abiertas con probabilidad y valor esperado</field>
+        <field name="ai_action_prompt">Lista todas las oportunidades abiertas actualmente</field>
+    </record>
+
+    <record id="ai_action_pipeline_summary" model="ir.actions.server">
+        <field name="name">Resumen del Pipeline</field>
+        <field name="model_id" ref="crm.model_crm_lead"/>
+        <field name="state">code</field>
+        <field name="code">
+result = env['ai.crm.actions'].get_pipeline_summary()
+        </field>
+        <field name="use_in_ai">True</field>
+        <field name="ai_tool_description">Resume el pipeline por etapa con conteo y valor total</field>
+        <field name="ai_action_prompt">Muestra un resumen del pipeline CRM por etapa</field>
+    </record>
+
+    <record id="ai_action_search_leads_by_stage" model="ir.actions.server">
+        <field name="name">Buscar Leads por Etapa</field>
+        <field name="model_id" ref="crm.model_crm_lead"/>
+        <field name="state">code</field>
+        <field name="code">
+result = env['ai.crm.actions'].search_leads_by_stage(stage_name)
+        </field>
+        <field name="use_in_ai">True</field>
+        <field name="ai_tool_description">Busca leads u oportunidades por etapa especificada</field>
+        <field name="ai_action_prompt">Busca leads por etapa</field>
+        <field name="ai_tool_schema">{
+  "type": "object",
+  "properties": {
+    "stage_name": {
+      "type": "string",
+      "description": "Nombre de la etapa (New, Qualified, Proposition, Won)"
+    }
+  },
+  "required": ["stage_name"]
+}</field>
+    </record>
+
+    <record id="ai_action_create_opportunity" model="ir.actions.server">
+        <field name="name">Crear Oportunidad</field>
+        <field name="model_id" ref="crm.model_crm_lead"/>
+        <field name="state">code</field>
+        <field name="code">
+exp_rev = 0.0
+if expected_revenue:
+    try:
+        if isinstance(expected_revenue, str):
+            exp_rev = float(''.join(c for c in expected_revenue if c.isdigit() or c == '.'))
+        else:
+            exp_rev = float(expected_revenue)
+    except:
+        exp_rev = 0.0
+
+result = env['ai.crm.actions'].create_opportunity(
+    name=name,
+    customer_name=customer_name,
+    email=email,
+    phone=phone,
+    stage_name=stage_name,
+    expected_revenue=exp_rev
+)
+        </field>
+        <field name="use_in_ai">True</field>
+        <field name="ai_tool_description">Crea una oportunidad CRM con todos los detalles necesarios</field>
+        <field name="ai_action_prompt">Crea una oportunidad en CRM</field>
+        <field name="ai_tool_schema">{
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Nombre de la oportunidad"
+    },
+    "customer_name": {
+      "type": "string",
+      "description": "Nombre del cliente"
+    },
+    "email": {
+      "type": "string",
+      "description": "Email del cliente"
+    },
+    "phone": {
+      "type": "string",
+      "description": "Teléfono del cliente"
+    },
+    "stage_name": {
+      "type": "string",
+      "description": "Etapa: New, Qualified, Proposition, Won"
+    },
+    "expected_revenue": {
+      "type": "number",
+      "description": "Ingreso esperado en números"
+    }
+  },
+  "required": ["name"]
+}</field>
+    </record>
+
+    <record id="ai_action_search_quotations_with_stock" model="ir.actions.server">
+        <field name="name">Buscar Cotizaciones con Stock</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="state">code</field>
+        <field name="code">
+result = env['ai.crm.actions'].search_quotations_with_stock(product_name)
+        </field>
+        <field name="use_in_ai">True</field>
+        <field name="ai_tool_description">Busca cotizaciones que contengan un producto específico y muestra el stock disponible para cada producto cotizado</field>
+        <field name="ai_action_prompt">Cuando el usuario pregunta por cotizaciones de productos (ej: '¿existe cotización para pelotas?', '¿hay presupuesto de balones?'), usa esta herramienta</field>
+        <field name="ai_tool_schema">{
+  "type": "object",
+  "properties": {
+    "product_name": {
+      "type": "string",
+      "description": "Nombre o categoría del producto a buscar en cotizaciones"
+    }
+  },
+  "required": ["product_name"]
+}</field>
+    </record>
+
+</odoo>
