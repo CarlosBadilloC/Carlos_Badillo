@@ -54,37 +54,37 @@
 
 
 
-**🧠Dependencias de Odoo**
+- **🧠Dependencias de Odoo**
 
 
-- 'base'
-- 'mail'
-- 'product'
-- 'stock'
-- 'ai'
-- 'crm'
-- 'sale'
-- 'website'
-- 'im_livechat'
+	- 'base'
+	- 'mail'
+	- 'product'
+	- 'stock'
+	- 'ai'
+	- 'crm'
+	- 'sale'
+	- 'website'
+	- 'im_livechat'
 
 
-**🧠Dependencias de Python**
+- **🧠Dependencias de Python**
+
+	
+	- google-generativeai>=0.3.0
+	- protobuf>=3.20.0
+	- google-api-core>=2.11.0
+	- google-auth>=2.16.0
+	- grpcio>=1.48.0
+	- requests>=2.28.0
 
 
-- google-generativeai>=0.3.0
-- protobuf>=3.20.0
-- google-api-core>=2.11.0
-- google-auth>=2.16.0
-- grpcio>=1.48.0
-- requests>=2.28.0
+- **🧠Versiones**
 
 
-**🧠Versiones**
-
-
-- Odoo: 19.0+
-- Python: 3.10+
-- PostgreSQL: 12+
+	- Odoo: 19.0+
+	- Python: 3.10+
+	- PostgreSQL: 12+
 
 
 
@@ -157,30 +157,30 @@
 ### 🎯 Funcionalidades
 
 
-**Acciones de Inventario**
+- **Acciones de Inventario**
 
 
-  | Función| Descripción | Modelo |
-  |----------|-----------|-----------|
-  | get_stock()   | Obtiene stock de productos    | ai.inventory.actions   |
-  |search_products_detailed()   | Búsqueda avanzada con detalles   | ai.inventory.actions   |
-  | check_low_stock()   | Detecta productos con poco stock| ai.inventory.actions    |
-  | get_inventory_summary()   | Resumen completo del inventario   | 	ai.inventory.actions   |
-  | search_product_by_category()  | Búsqueda por categoría    |ai.inventory.actions    |
+	  | Función| Descripción | Modelo |
+	  |----------|-----------|-----------|
+	  | get_stock()   | Obtiene stock de productos    | ai.inventory.actions   |
+	  |search_products_detailed()   | Búsqueda avanzada con detalles   | ai.inventory.actions   |
+	  | check_low_stock()   | Detecta productos con poco stock| ai.inventory.actions    |
+	  | get_inventory_summary()   | Resumen completo del inventario   | 	ai.inventory.actions   |
+	  | search_product_by_category()  | Búsqueda por categoría    |ai.inventory.actions    |
 
 		
 		
-**Acciones de CRM**
+- **Acciones de CRM**
 
 
-  | Función| Descripción | Modelo |
-  |----------|-----------|-----------|
-  | create_opportunity()   |Crea nueva oportunidad   |ai.crm.actions   |
-  |create_lead()   | Crea nuevo lead   | 	ai.crm.actions   |
-  | get_lead_info()  | Obtiene información de lead| ai.crm.actions    |
-  |list_open_opportunities()   | Lista oportunidades abiertas   | 		ai.crm.actions  |
-  | get_pipeline_summary()  | 	Resumen del pipeline    |ai.crm.actions    |
-  |search_quotations_with_stock()  | 	Busca cotizaciones con stock    | ai.crm.actions   |
+	  | Función| Descripción | Modelo |
+	  |----------|-----------|-----------|
+	  | create_opportunity()   |Crea nueva oportunidad   |ai.crm.actions   |
+	  |create_lead()   | Crea nuevo lead   | 	ai.crm.actions   |
+	  | get_lead_info()  | Obtiene información de lead| ai.crm.actions    |
+	  |list_open_opportunities()   | Lista oportunidades abiertas   | 		ai.crm.actions  |
+	  | get_pipeline_summary()  | 	Resumen del pipeline    |ai.crm.actions    |
+	  |search_quotations_with_stock()  | 	Busca cotizaciones con stock    | ai.crm.actions   |
 
 
 
