@@ -1,6 +1,6 @@
 # Carlos_Badillo
 
-Agente IA para Odoo 19
+# Agente IA para Odoo 19
 
 
 <img src="https://img.shields.io/badge/Odoo-19.0-blue.svg" alt="Odoo Version">
@@ -10,9 +10,9 @@ Agente IA para Odoo 19
 <img src="https://img.shields.io/badge/License-LGPL--3-purple.svg" alt="License">
 
 
-Módulo de integración de Inteligencia Artificial para Odoo 19 que proporciona un asistente virtual especializado en gestión de inventario y CRM con soporte para LiveChat.
+## Módulo de integración de Inteligencia Artificial para Odoo 19 que proporciona un asistente virtual especializado en gestión de inventario y CRM con soporte para LiveChat.
 
-📋 Tabla de Contenidos
+### 📋 Tabla de Contenidos
 
 
 Características
@@ -29,7 +29,7 @@ Licencia
 
 
 
-🚀 Características
+### 🚀 Características
 
 
 Gestión de Inventario
@@ -51,4 +51,68 @@ Integración con LiveChat
 ✅ Procesamiento de lenguaje natural
 ✅ Detección inteligente de intenciones
 ✅ Soporte multicanal
-📦 Requisitos
+
+
+
+### 📦 Requisitos
+
+
+
+**🧠Dependencias de Odoo**
+
+
+'base'
+'mail'
+'product'
+'stock'
+'ai'
+'crm'
+'sale'
+'website'
+'im_livechat'
+
+
+**🧠Dependencias de Python**
+
+
+google-generativeai>=0.3.0
+protobuf>=3.20.0
+google-api-core>=2.11.0
+google-auth>=2.16.0
+grpcio>=1.48.0
+requests>=2.28.0
+
+
+**🧠Versiones**
+
+
+Odoo: 19.0+
+Python: 3.10+
+PostgreSQL: 12+
+
+
+
+### 🔧 Instalación
+
+
+-Clonar el Repositorio
+
+
+git clone https://github.com/yourusername/modulo.git
+
+
+-Instalar Dependencias Python
+
+
+pip install -r requirements.txt
+
+
+-Actualizar Lista de Aplicaciones
+
+
+Accede a Odoo:
+
+1. Ve a Aplicaciones
+2. Haz clic en Actualizar lista de aplicaciones
+3. Busca "Agente AI"
+4. Haz clic en Instalar
