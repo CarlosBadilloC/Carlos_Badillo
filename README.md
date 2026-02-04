@@ -191,32 +191,34 @@ PostgreSQL: 12+
 ### 🏗️ Arquitectura
 
 
-modulo/
-├── __init__.py
-├── __manifest__.py
-├── controllers/
-│   ├── __init__.py
-│   └── controllers.py
-├── data/
-│   ├── ai_actions.xml              # Definición de acciones de servidor
-│   ├── ai_agent.xml                # Configuración del agente IA
-│   ├── ai_crm_actions.xml          # Acciones CRM
-│   ├── ai_agent_source.xml         # Fuentes de datos
-│   └── livechat_ai_integration.xml # Integración LiveChat
-├── models/
-│   ├── __init__.py
-│   ├── ai_actions.py               # Acciones de inventario
-│   ├── ai_crm_actions.py           # Acciones de CRM
-│   ├── livechat_integration.py     # Lógica de integración
-│   ├── livechat_message_handler.py # Manejo de mensajes
-│   ├── models.py                   # Modelos base
-│   └── res_config_settings.py      # Configuración
-├── security/
-│   └── ir.model.access.csv         # Permisos de acceso
-└── views/
-    ├── res_config_settings_views.xml # Vistas de configuración
-    ├── templates.xml
-    └── views.xml
+- **modulo/**
+  - `__init__.py`
+  - `__manifest__.py`
+
+- **controllers/**
+  - `controllers.py` → Controladores HTTP
+
+- **data/**
+  - `ai_actions.xml` → Acciones del agente IA
+  - `ai_agent.xml` → Configuración del agente
+  - `ai_crm_actions.xml` → Acciones CRM
+  - `ai_agent_source.xml` → Fuentes de datos
+  - `livechat_ai_integration.xml` → Integración LiveChat
+
+- **models/**
+  - `ai_actions.py` → Lógica de inventario
+  - `ai_crm_actions.py` → Lógica CRM
+  - `livechat_integration.py`
+  - `livechat_message_handler.py`
+  - `res_config_settings.py`
+
+- **security/**
+  - `ir.model.access.csv`
+
+- **views/**
+  - `res_config_settings_views.xml`
+  - `templates.xml`
+  - `views.xml`
 
 
 ### 👥 Autores
