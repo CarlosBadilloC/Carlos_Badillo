@@ -147,13 +147,16 @@ PostgreSQL: 12+
 - Integración con LiveChat
   - *El asistente responde automáticamente en LiveChat cuando detecta mensajes de usuarios.*
 
-  - Ejemplos de consultas:
-    1.Usuario: "¿Hay cotizaciones para pelotas?"
-      Bot: Muestra cotizaciones con verificación de stock
-    2. Usuario: "productos con stock bajo"
-      Bot: Reporta productos bajo el umbral configurado
-    3. Usuario: "busco sillas de oficina"
-      Bot: Lista todos los productos relacionados con stock y precios
+  - 💡 Ejemplos de consultas:
+    1. 🔍 Cotizaciones:
+    	Usuario: "¿Hay cotizaciones para pelotas?"
+      	Bot: Muestra cotizaciones con verificación de stock
+    2. ⚠️ Stock bajo:
+    	Usuario: "productos con stock bajo"
+      	Bot: Reporta productos bajo el umbral configurado
+    3 .📦 Consultar stock:
+    	Usuario: "busco sillas de oficina"
+      	Bot: Lista todos los productos relacionados con stock y precios
 
 ### 🎯 Funcionalidades
 
@@ -185,6 +188,50 @@ PostgreSQL: 12+
 
 
 
+### 🏗️ Arquitectura
+
+
+modulo/
+├── __init__.py
+├── __manifest__.py
+├── controllers/
+│   ├── __init__.py
+│   └── controllers.py
+├── data/
+│   ├── ai_actions.xml              # Definición de acciones de servidor
+│   ├── ai_agent.xml                # Configuración del agente IA
+│   ├── ai_crm_actions.xml          # Acciones CRM
+│   ├── ai_agent_source.xml         # Fuentes de datos
+│   └── livechat_ai_integration.xml # Integración LiveChat
+├── models/
+│   ├── __init__.py
+│   ├── ai_actions.py               # Acciones de inventario
+│   ├── ai_crm_actions.py           # Acciones de CRM
+│   ├── livechat_integration.py     # Lógica de integración
+│   ├── livechat_message_handler.py # Manejo de mensajes
+│   ├── models.py                   # Modelos base
+│   └── res_config_settings.py      # Configuración
+├── security/
+│   └── ir.model.access.csv         # Permisos de acceso
+└── views/
+    ├── res_config_settings_views.xml # Vistas de configuración
+    ├── templates.xml
+    └── views.xml
+
+
+### 👥 Autores
+
+
+**Carlos Badillo** - *Desarrollo inicial*
+
+
+
+### 🙏 Agradecimientos
+
+- Sellside spa
+- Comunidad de Odoo
+- Google Generative AI
+  
 
 
 
