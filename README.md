@@ -57,26 +57,26 @@
 **🧠Dependencias de Odoo**
 
 
-'base'
-'mail'
-'product'
-'stock'
-'ai'
-'crm'
-'sale'
-'website'
-'im_livechat'
+- 'base'
+- 'mail'
+- 'product'
+- 'stock'
+- 'ai'
+- 'crm'
+- 'sale'
+- 'website'
+- 'im_livechat'
 
 
 **🧠Dependencias de Python**
 
 
-google-generativeai>=0.3.0
-protobuf>=3.20.0
-google-api-core>=2.11.0
-google-auth>=2.16.0
-grpcio>=1.48.0
-requests>=2.28.0
+- google-generativeai>=0.3.0
+- protobuf>=3.20.0
+- google-api-core>=2.11.0
+- google-auth>=2.16.0
+- grpcio>=1.48.0
+- requests>=2.28.0
 
 
 **🧠Versiones**
