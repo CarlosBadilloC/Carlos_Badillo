@@ -46,7 +46,6 @@
 	- ✅ Respuestas automáticas en tiempo real
 	- ✅ Procesamiento de lenguaje natural
 	- ✅ Detección inteligente de intenciones
-	- ✅ Soporte multicanal
 
 
 
