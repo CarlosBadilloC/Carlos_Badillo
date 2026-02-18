@@ -24,6 +24,8 @@ odoo.define('modulo.A2UIDashboard', function(require) {
                 return this.renderOpportunities();
             } else if (type === 'alert_table') {
                 return this.renderAlertTable();
+            } else if (type === 'help_menu') {
+                return this.renderHelpMenu();
             }
         }
 
@@ -61,6 +63,29 @@ odoo.define('modulo.A2UIDashboard', function(require) {
                             ${card.subtitle ? `<div class="card-subtitle">${card.subtitle}</div>` : ''}
                         </div>
                     `).join('')}
+                </div>
+            `;
+        }
+
+        renderHelpMenu() {
+            const data = this.dashboard;
+            return `
+                <div class="a2ui-help-menu">
+                    <div class="help-options">
+                        ${data.options.map(option => `
+                            <div class="help-option-card">
+                                <div class="option-icon">${option.icon}</div>
+                                <div class="option-title">${option.title}</div>
+                                <div class="option-description">${option.description}</div>
+                                <div class="option-keywords">
+                                    ${option.keywords.map(kw => `<span class="keyword">${kw}</span>`).join('')}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div class="help-message">
+                        ${data.message}
+                    </div>
                 </div>
             `;
         }

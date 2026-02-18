@@ -1,47 +1,62 @@
-.a2ui-cards-container {
+
+.help-options {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 15px;
-    margin: 15px 0;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+    margin-bottom: 20px;
 }
 
-.a2ui-card {
-    padding: 20px;
-    border-radius: 8px;
-    color: white;
-    text-align: center;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-}
-
-.a2ui-card.bg-primary { background: #0066cc; }
-.a2ui-card.bg-success { background: #28a745; }
-.a2ui-card.bg-info { background: #17a2b8; }
-.a2ui-card.bg-warning { background: #ffc107; color: #333; }
-
-.a2ui-card .card-icon {
-    font-size: 32px;
-    margin-bottom: 10px;
-}
-
-.a2ui-card .card-value {
-    font-size: 24px;
-    font-weight: bold;
-    margin: 10px 0;
-}
-
-.a2ui-table-container {
-    margin: 15px 0;
-    background: white;
+.help-option-card {
+    background: rgba(255, 255, 255, 0.15);
     padding: 15px;
-    border-radius: 8px;
-    overflow-x: auto;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    cursor: pointer;
+    transition: all 0.3s ease;
 }
 
-.a2ui-table-container h3 {
-    margin-bottom: 15px;
-    color: #333;
+.help-option-card:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-.a2ui-table-container table {
-    margin-bottom: 0;
+.option-icon {
+    font-size: 28px;
+    margin-bottom: 8px;
+}
+
+.option-title {
+    font-weight: bold;
+    margin-bottom: 6px;
+    font-size: 14px;
+}
+
+.option-description {
+    font-size: 12px;
+    opacity: 0.9;
+    margin-bottom: 8px;
+}
+
+.option-keywords {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+}
+
+.keyword {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 11px;
+    display: inline-block;
+}
+
+.help-message {
+    background: rgba(0, 0, 0, 0.1);
+    padding: 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    line-height: 1.5;
+    border-left: 3px solid rgba(255, 255, 255, 0.5);
 }

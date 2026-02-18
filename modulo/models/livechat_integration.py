@@ -1,6 +1,7 @@
 from odoo import models, api, fields
 import logging
 import re
+import json
 
 _logger = logging.getLogger(__name__)
 
@@ -17,6 +18,44 @@ class LivechatIntegration(models.Model):
         string="Canal Livechat",
         required=False
     )
+
+    @api.model
+    def _get_help_menu(self):
+        """Retorna un menú de ayuda cuando no se detecta una acción específica"""
+        help_menu = {
+            'text': '👋 ¿Cómo puedo ayudarte?',
+            'a2ui_dashboard': {
+                'type': 'help_menu',
+                'options': [
+                    {
+                        'icon': '📦',
+                        'title': 'Inventario',
+                        'description': 'Buscar productos, verificar stock, estado de inventario',
+                        'keywords': ['productos', 'stock', 'inventario', 'disponibilidad']
+                    },
+                    {
+                        'icon': '🎯',
+                        'title': 'CRM',
+                        'description': 'Oportunidades, leads, pipeline de ventas',
+                        'keywords': ['oportunidades', 'leads', 'pipeline', 'ventas']
+                    },
+                    {
+                        'icon': '💰',
+                        'title': 'Cotizaciones',
+                        'description': 'Buscar presupuestos y cotizaciones de productos',
+                        'keywords': ['cotización', 'presupuesto', 'quote', 'cotizaciones']
+                    },
+                    {
+                        'icon': '⚠️',
+                        'title': 'Stock Bajo',
+                        'description': 'Ver productos con stock bajo para reabastecer',
+                        'keywords': ['stock bajo', 'poco stock', 'reabastecer']
+                    }
+                ],
+                'message': 'Prueba escribiendo frases como:\n• "Busco pelotas de futbol"\n• "¿Cuál es el resumen del pipeline?"\n• "¿Existe cotización para balones?"\n• "Muestra stock bajo"'
+            }
+        }
+        return self._format_a2ui_response(help_menu)
 
     @api.model
     def _call_ai_agent(self, ai_agent, prompt):
@@ -85,7 +124,7 @@ class LivechatIntegration(models.Model):
     @api.model
     def _extract_product_from_prompt(self, prompt):
         """Extrae nombre de producto del prompt usando regex con límites de palabra"""
-        # Patrón regex para eliminar palabras COMPLETAS (con \b = límites de palabra)
+        # ...existing code...
         stopwords_pattern = r'\b(existe|hay|alguna|algún|muéstrame|dame|verifica|para|con|en|el|la|los|las|de|del|cotización|cotizacion|cotizaciones|presupuesto|presupuestos|quote|quotes)\b'
         
         # Limpiar caracteres especiales primero
@@ -107,6 +146,7 @@ class LivechatIntegration(models.Model):
     @api.model
     def _extract_category_from_prompt(self, prompt):
         """Extrae nombre de categoría del prompt"""
+        # ...existing code...
         match = re.search(r'categoría\s+([a-záéíóú\w]+)|categoria\s+([a-záéíóú\w]+)', prompt, re.IGNORECASE)
         if match:
             category = match.group(1) or match.group(2)
@@ -117,6 +157,7 @@ class LivechatIntegration(models.Model):
     @api.model
     def _extract_stage_from_prompt(self, prompt):
         """Extrae nombre de etapa del prompt"""
+        # ...existing code...
         stages = {
             'qualified': 'Qualified',
             'proposition': 'Proposition',
@@ -132,6 +173,7 @@ class LivechatIntegration(models.Model):
     @api.model
     def _extract_lead_name_from_prompt(self, prompt):
         """Extrae nombre del lead/oportunidad del prompt"""
+        # ...existing code...
         cleaned = re.sub(r'(información|info|detalles|details|dame|tell\s+me|lead|oportunidad|opportunity|del?|de|la)', '', prompt, flags=re.IGNORECASE).strip()
         _logger.info(f"Lead/Oportunidad extraída: '{cleaned}'")
         return cleaned or 'lead'
@@ -139,6 +181,7 @@ class LivechatIntegration(models.Model):
     @api.model
     def _extract_opportunity_data(self, prompt):
         """Extrae datos para crear oportunidad del prompt"""
+        # ...existing code...
         data = {
             'name': '',
             'customer_name': '',
