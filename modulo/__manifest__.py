@@ -28,13 +28,14 @@ Módulo de integración de IA para control de inventario y CRM con soporte para 
         'views/views.xml',
         'views/templates.xml',
         'views/res_config_settings_views.xml',
+        'security/ir.model.access.csv',
     ],
     'demo': [
         'demo/demo.xml',
     ],
     'assets': {
         'web.assets_common': [
-            'modulo/static/src/css/dashboard.css',
+            'modulo/static/css/dashboard.css',
         ],
     },
     'installable': True,

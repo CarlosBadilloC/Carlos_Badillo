@@ -114,12 +114,12 @@ class LivechatIntegration(models.Model):
         # Generar HTML para renderizar en el chat
         html = self._generate_dashboard_html(dashboard)
         
-        # Retornar texto + HTML que Livechat renderizará
-        return f"{text}\n{html}"
+        # Retornar HTML con estilos inline
+        return f"<div>{text}</div>{html}"
     
     @api.model
     def _generate_dashboard_html(self, dashboard):
-        """Genera HTML directo para los dashboards"""
+        """Genera HTML directo para los dashboards con CSS inline"""
         dashboard_type = dashboard.get('type', '')
         
         if dashboard_type == 'table':
@@ -145,32 +145,36 @@ class LivechatIntegration(models.Model):
         rows = dashboard.get('rows', [])
         
         html = f"""
-        <div style="margin-top: 15px; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-            <h3 style="padding: 15px; background: #f8f9fa; margin: 0; color: #333; font-size: 16px; border-bottom: 1px solid #ddd;">{title}</h3>
-            <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
-                <thead>
-                    <tr style="background: #f8f9fa; border-bottom: 2px solid #ddd;">
+        <div style="margin: 15px 0; background: white; border-radius: 8px; overflow: hidden; border: 1px solid #e0e0e0;">
+            <div style="padding: 15px; background: #f5f5f5; border-bottom: 1px solid #e0e0e0;">
+                <h3 style="margin: 0; color: #333; font-size: 16px;">{title}</h3>
+            </div>
+            <div style="overflow-x: auto;">
+                <table cellpadding="0" cellspacing="0" style="width: 100%; border-collapse: collapse; font-size: 13px;">
+                    <thead>
+                        <tr style="background: #f9f9f9; border-bottom: 2px solid #e0e0e0;">
         """
         
         for col in columns:
-            html += f"<th style='padding: 12px; text-align: left; color: #666; font-weight: 600;'>{col['label']}</th>"
+            html += f"<th style='padding: 12px; text-align: left; color: #666; font-weight: 600; border-right: 1px solid #f0f0f0;'>{col['label']}</th>"
         
         html += """
-                    </tr>
-                </thead>
-                <tbody>
+                        </tr>
+                    </thead>
+                    <tbody>
         """
         
         for row in rows:
-            html += "<tr style='border-bottom: 1px solid #eee;'>"
+            html += "<tr style='border-bottom: 1px solid #f0f0f0;'>"
             for col in columns:
                 value = row.get(col['key'], '')
-                html += f"<td style='padding: 12px; color: #333;'>{value}</td>"
+                html += f"<td style='padding: 12px; color: #333; border-right: 1px solid #f0f0f0;'>{value}</td>"
             html += "</tr>"
         
         html += """
-                </tbody>
-            </table>
+                    </tbody>
+                </table>
+            </div>
         </div>
         """
         return html
@@ -185,24 +189,26 @@ class LivechatIntegration(models.Model):
             'primary': '#0066cc',
             'success': '#28a745',
             'info': '#17a2b8',
-            'warning': '#ffc107'
+            'warning': '#ffc107',
+            'danger': '#dc3545'
         }
         
-        html = "<div style='display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 15px;'>"
+        html = "<div style='display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin: 15px 0;'>"
         
         for card in cards:
             color = colors.get(card.get('color', 'primary'), '#0066cc')
+            text_color = 'white' if card.get('color') != 'warning' else '#333'
             icon = card.get('icon', '📊')
             title = card.get('title', '')
             value = card.get('value', '')
             subtitle = card.get('subtitle', '')
             
             html += f"""
-            <div style="background: {color}; color: white; padding: 20px; border-radius: 8px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-                <div style="font-size: 32px; margin-bottom: 10px;">{icon}</div>
-                <div style="font-size: 14px; opacity: 0.9; margin-bottom: 8px;">{title}</div>
-                <div style="font-size: 24px; font-weight: bold; margin: 10px 0;">{value}</div>
-                {f'<div style="font-size: 12px; opacity: 0.8;">{subtitle}</div>' if subtitle else ''}
+            <div style="background: {color}; color: {text_color}; padding: 15px; border-radius: 6px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                <div style="font-size: 28px; margin-bottom: 8px;">{icon}</div>
+                <div style="font-size: 12px; opacity: 0.85; margin-bottom: 6px;">{title}</div>
+                <div style="font-size: 20px; font-weight: bold; margin: 6px 0;">{value}</div>
+                {f'<div style="font-size: 11px; opacity: 0.75;">{subtitle}</div>' if subtitle else ''}
             </div>
             """
         
@@ -215,32 +221,36 @@ class LivechatIntegration(models.Model):
             title = table_data.get('title', '')
             
             html += f"""
-            <div style="margin-top: 15px; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-                <h4 style="padding: 12px 15px; background: #f8f9fa; margin: 0; color: #333; border-bottom: 1px solid #ddd;">{title}</h4>
-                <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
-                    <thead>
-                        <tr style="background: #f8f9fa; border-bottom: 2px solid #ddd;">
+            <div style="margin: 15px 0; background: white; border-radius: 8px; overflow: hidden; border: 1px solid #e0e0e0;">
+                <div style="padding: 12px 15px; background: #f5f5f5; border-bottom: 1px solid #e0e0e0;">
+                    <h4 style="margin: 0; color: #333; font-size: 14px;">{title}</h4>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table cellpadding="0" cellspacing="0" style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                        <thead>
+                            <tr style="background: #f9f9f9; border-bottom: 2px solid #e0e0e0;">
             """
             
             for col in columns:
-                html += f"<th style='padding: 10px 12px; text-align: left; color: #666; font-weight: 600;'>{col['label']}</th>"
+                html += f"<th style='padding: 10px 12px; text-align: left; color: #666; font-weight: 600; border-right: 1px solid #f0f0f0;'>{col['label']}</th>"
             
             html += """
-                        </tr>
-                    </thead>
-                    <tbody>
+                            </tr>
+                        </thead>
+                        <tbody>
             """
             
             for row in rows:
-                html += "<tr style='border-bottom: 1px solid #eee;'>"
+                html += "<tr style='border-bottom: 1px solid #f0f0f0;'>"
                 for col in columns:
                     value = row.get(col['key'], '')
-                    html += f"<td style='padding: 10px 12px; color: #333;'>{value}</td>"
+                    html += f"<td style='padding: 10px 12px; color: #333; border-right: 1px solid #f0f0f0;'>{value}</td>"
                 html += "</tr>"
             
             html += """
-                    </tbody>
-                </table>
+                        </tbody>
+                    </table>
+                </div>
             </div>
             """
         
@@ -255,44 +265,46 @@ class LivechatIntegration(models.Model):
         summary = dashboard.get('summary', {})
         
         html = f"""
-        <div style="margin-top: 15px; background: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; border-radius: 8px;">
-            <div style="color: #856404; font-weight: bold; margin-bottom: 15px;">⚠️ {title}</div>
+        <div style="margin: 15px 0; background: #fff8e1; border-left: 4px solid #ffc107; padding: 15px; border-radius: 6px; border: 1px solid #ffe0b2;">
+            <div style="color: #f57f17; font-weight: bold; margin-bottom: 12px; font-size: 14px;">⚠️ {title}</div>
             
-            <div style="background: white; border-radius: 6px; overflow: hidden; margin-bottom: 15px;">
-                <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
-                    <thead>
-                        <tr style="background: #f8f9fa; border-bottom: 2px solid #ddd;">
+            <div style="background: white; border-radius: 4px; overflow: hidden; margin-bottom: 12px; border: 1px solid #e0e0e0;">
+                <div style="overflow-x: auto;">
+                    <table cellpadding="0" cellspacing="0" style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                        <thead>
+                            <tr style="background: #f9f9f9; border-bottom: 2px solid #e0e0e0;">
         """
         
         for col in columns:
-            html += f"<th style='padding: 10px 12px; text-align: left; color: #666; font-weight: 600;'>{col['label']}</th>"
+            html += f"<th style='padding: 10px 12px; text-align: left; color: #666; font-weight: 600; border-right: 1px solid #f0f0f0;'>{col['label']}</th>"
         
         html += """
-                        </tr>
-                    </thead>
-                    <tbody>
+                            </tr>
+                        </thead>
+                        <tbody>
         """
         
         for row in rows:
-            html += "<tr style='border-bottom: 1px solid #eee;'>"
+            html += "<tr style='border-bottom: 1px solid #f0f0f0;'>"
             for col in columns:
                 value = row.get(col['key'], '')
-                html += f"<td style='padding: 10px 12px; color: #333;'>{value}</td>"
+                html += f"<td style='padding: 10px 12px; color: #333; border-right: 1px solid #f0f0f0;'>{value}</td>"
             html += "</tr>"
         
         html += f"""
-                    </tbody>
-                </table>
+                        </tbody>
+                    </table>
+                </div>
             </div>
             
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px;">
-                <div style="background: white; padding: 10px; border-radius: 6px;">
-                    <div style="color: #666; font-size: 12px;">Total Productos</div>
-                    <div style="font-size: 18px; font-weight: bold; color: #333;">{summary.get('total_products', 0)}</div>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px;">
+                <div style="background: white; padding: 10px; border-radius: 4px; border: 1px solid #e0e0e0;">
+                    <div style="color: #999; font-size: 11px; margin-bottom: 4px;">📦 Total Productos</div>
+                    <div style="font-size: 16px; font-weight: bold; color: #333;">{summary.get('total_products', 0)}</div>
                 </div>
-                <div style="background: white; padding: 10px; border-radius: 6px;">
-                    <div style="color: #666; font-size: 12px;">Valor a Reabastecer</div>
-                    <div style="font-size: 18px; font-weight: bold; color: #d9534f;">{summary.get('restock_value', '$0.00')}</div>
+                <div style="background: white; padding: 10px; border-radius: 4px; border: 1px solid #e0e0e0;">
+                    <div style="color: #999; font-size: 11px; margin-bottom: 4px;">💰 Reabastecer</div>
+                    <div style="font-size: 16px; font-weight: bold; color: #d32f2f;">{summary.get('restock_value', '$0.00')}</div>
                 </div>
             </div>
         </div>
@@ -308,45 +320,47 @@ class LivechatIntegration(models.Model):
         
         colors = {'primary': '#0066cc', 'success': '#28a745'}
         
-        html = "<div style='display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-top: 15px;'>"
+        html = "<div style='display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin: 15px 0;'>"
         
         for card in cards:
             color = colors.get(card.get('color', 'primary'), '#0066cc')
             html += f"""
-            <div style="background: {color}; color: white; padding: 15px; border-radius: 8px; text-align: center;">
-                <div style="font-size: 28px; margin-bottom: 8px;">{card.get('icon', '🎯')}</div>
-                <div style="font-size: 12px; opacity: 0.9;">{card.get('title', '')}</div>
-                <div style="font-size: 20px; font-weight: bold; margin: 8px 0;">{card.get('value', '')}</div>
+            <div style="background: {color}; color: white; padding: 12px; border-radius: 6px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                <div style="font-size: 24px; margin-bottom: 6px;">{card.get('icon', '🎯')}</div>
+                <div style="font-size: 11px; opacity: 0.85; margin-bottom: 4px;">{card.get('title', '')}</div>
+                <div style="font-size: 18px; font-weight: bold;">{card.get('value', '')}</div>
             </div>
             """
         
         html += """
         </div>
-        <div style="margin-top: 15px; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
-                <thead>
-                    <tr style="background: #f8f9fa; border-bottom: 2px solid #ddd;">
+        <div style="margin: 15px 0; background: white; border-radius: 6px; overflow: hidden; border: 1px solid #e0e0e0;">
+            <div style="overflow-x: auto;">
+                <table cellpadding="0" cellspacing="0" style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                    <thead>
+                        <tr style="background: #f9f9f9; border-bottom: 2px solid #e0e0e0;">
         """
         
         for col in columns:
-            html += f"<th style='padding: 10px 12px; text-align: left; color: #666; font-weight: 600;'>{col['label']}</th>"
+            html += f"<th style='padding: 10px 12px; text-align: left; color: #666; font-weight: 600; border-right: 1px solid #f0f0f0;'>{col['label']}</th>"
         
         html += """
-                    </tr>
-                </thead>
-                <tbody>
+                        </tr>
+                    </thead>
+                    <tbody>
         """
         
         for row in rows:
-            html += "<tr style='border-bottom: 1px solid #eee;'>"
+            html += "<tr style='border-bottom: 1px solid #f0f0f0;'>"
             for col in columns:
                 value = row.get(col['key'], '')
-                html += f"<td style='padding: 10px 12px; color: #333;'>{value}</td>"
+                html += f"<td style='padding: 10px 12px; color: #333; border-right: 1px solid #f0f0f0;'>{value}</td>"
             html += "</tr>"
         
         html += """
-                </tbody>
-            </table>
+                    </tbody>
+                </table>
+            </div>
         </div>
         """
         return html
@@ -359,48 +373,50 @@ class LivechatIntegration(models.Model):
         
         colors = {'primary': '#0066cc', 'success': '#28a745', 'info': '#17a2b8'}
         
-        html = "<div style='display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-top: 15px;'>"
+        html = "<div style='display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin: 15px 0;'>"
         
         for card in cards:
             color = colors.get(card.get('color', 'primary'), '#0066cc')
             html += f"""
-            <div style="background: {color}; color: white; padding: 15px; border-radius: 8px; text-align: center;">
-                <div style="font-size: 28px; margin-bottom: 8px;">{card.get('icon', '📊')}</div>
-                <div style="font-size: 12px; opacity: 0.9;">{card.get('title', '')}</div>
-                <div style="font-size: 20px; font-weight: bold; margin: 8px 0;">{card.get('value', '')}</div>
+            <div style="background: {color}; color: white; padding: 12px; border-radius: 6px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                <div style="font-size: 24px; margin-bottom: 6px;">{card.get('icon', '📊')}</div>
+                <div style="font-size: 11px; opacity: 0.85; margin-bottom: 4px;">{card.get('title', '')}</div>
+                <div style="font-size: 18px; font-weight: bold;">{card.get('value', '')}</div>
             </div>
             """
         
         html += """
         </div>
-        <div style="margin-top: 15px;">
-            <h4 style="color: #333; margin-bottom: 12px;">Pipeline por Etapa</h4>
-            <div style="background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-                <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
-                    <thead>
-                        <tr style="background: #f8f9fa; border-bottom: 2px solid #ddd;">
-                            <th style='padding: 10px 12px; text-align: left; color: #666; font-weight: 600;'>Etapa</th>
-                            <th style='padding: 10px 12px; text-align: left; color: #666; font-weight: 600;'>Cantidad</th>
-                            <th style='padding: 10px 12px; text-align: left; color: #666; font-weight: 600;'>Ingresos</th>
-                            <th style='padding: 10px 12px; text-align: left; color: #666; font-weight: 600;'>Promedio</th>
-                        </tr>
-                    </thead>
-                    <tbody>
+        <div style="margin: 15px 0;">
+            <h4 style="color: #333; margin: 0 0 12px 0; font-size: 14px;">📊 Pipeline por Etapa</h4>
+            <div style="background: white; border-radius: 6px; overflow: hidden; border: 1px solid #e0e0e0;">
+                <div style="overflow-x: auto;">
+                    <table cellpadding="0" cellspacing="0" style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                        <thead>
+                            <tr style="background: #f9f9f9; border-bottom: 2px solid #e0e0e0;">
+                                <th style='padding: 10px 12px; text-align: left; color: #666; font-weight: 600; border-right: 1px solid #f0f0f0;'>Etapa</th>
+                                <th style='padding: 10px 12px; text-align: center; color: #666; font-weight: 600; border-right: 1px solid #f0f0f0;'>Cantidad</th>
+                                <th style='padding: 10px 12px; text-align: right; color: #666; font-weight: 600; border-right: 1px solid #f0f0f0;'>Ingresos</th>
+                                <th style='padding: 10px 12px; text-align: right; color: #666; font-weight: 600;'>Promedio</th>
+                            </tr>
+                        </thead>
+                        <tbody>
         """
         
         for stage in stages:
             html += f"""
-                        <tr style='border-bottom: 1px solid #eee;'>
-                            <td style='padding: 10px 12px; color: #333;'>{stage.get('stage', '')}</td>
-                            <td style='padding: 10px 12px; color: #333;'>{stage.get('count', 0)}</td>
-                            <td style='padding: 10px 12px; color: #28a745; font-weight: bold;'>{stage.get('revenue', '$0.00')}</td>
-                            <td style='padding: 10px 12px; color: #333;'>{stage.get('avg_deal', '$0.00')}</td>
-                        </tr>
+                            <tr style='border-bottom: 1px solid #f0f0f0;'>
+                                <td style='padding: 10px 12px; color: #333; border-right: 1px solid #f0f0f0;'>{stage.get('stage', '')}</td>
+                                <td style='padding: 10px 12px; color: #333; text-align: center; border-right: 1px solid #f0f0f0; font-weight: bold;'>{stage.get('count', 0)}</td>
+                                <td style='padding: 10px 12px; color: #28a745; text-align: right; border-right: 1px solid #f0f0f0; font-weight: bold;'>{stage.get('revenue', '$0.00')}</td>
+                                <td style='padding: 10px 12px; color: #333; text-align: right;'>{stage.get('avg_deal', '$0.00')}</td>
+                            </tr>
             """
         
         html += """
-                    </tbody>
-                </table>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
         """
@@ -413,25 +429,25 @@ class LivechatIntegration(models.Model):
         message = dashboard.get('message', '')
         
         html = """
-        <div style="margin-top: 15px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 8px;">
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 15px;">
+        <div style="margin: 15px 0; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px; border-radius: 8px;">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 12px;">
         """
         
         for option in options:
             keywords = ', '.join(option.get('keywords', []))
             html += f"""
-                <div style="background: rgba(255, 255, 255, 0.15); padding: 12px; border-radius: 6px; border: 1px solid rgba(255, 255, 255, 0.3);">
-                    <div style="font-size: 24px; margin-bottom: 8px;">{option.get('icon', '📦')}</div>
-                    <div style="font-weight: bold; font-size: 13px; margin-bottom: 4px;">{option.get('title', '')}</div>
-                    <div style="font-size: 11px; margin-bottom: 6px; opacity: 0.9;">{option.get('description', '')}</div>
-                    <div style="font-size: 10px; opacity: 0.8;">{keywords}</div>
+                <div style="background: rgba(255, 255, 255, 0.12); padding: 10px; border-radius: 4px; border: 1px solid rgba(255, 255, 255, 0.2);">
+                    <div style="font-size: 20px; margin-bottom: 6px;">{option.get('icon', '📦')}</div>
+                    <div style="font-weight: bold; font-size: 12px; margin-bottom: 3px;">{option.get('title', '')}</div>
+                    <div style="font-size: 10px; margin-bottom: 4px; opacity: 0.9;">{option.get('description', '')}</div>
+                    <div style="font-size: 9px; opacity: 0.8;">{keywords}</div>
                 </div>
             """
         
         html += f"""
             </div>
-            <div style="background: rgba(0, 0, 0, 0.1); padding: 12px; border-radius: 6px; font-size: 12px; line-height: 1.5; border-left: 3px solid rgba(255, 255, 255, 0.5);">
-                {message}
+            <div style="background: rgba(0, 0, 0, 0.15); padding: 10px; border-radius: 4px; font-size: 11px; line-height: 1.6; border-left: 3px solid rgba(255, 255, 255, 0.4);">
+                {message.replace(chr(10), '<br/>')}
             </div>
         </div>
         """

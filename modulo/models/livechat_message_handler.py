@@ -55,16 +55,23 @@ class MailMessage(models.Model):
 
             _logger.info(f"Procesando mensaje de livechat: {message_body[:50]}...")
 
-            # Obtener respuesta del agente IA
+            # Obtener respuesta del agente IA (ya incluye HTML)
             response = integration._call_ai_agent(integration.ai_agent_id, message_body)
 
             if response:
                 # Enviar respuesta del bot automáticamente
                 bot_partner = self.env.ref('base.partner_root', raise_if_not_found=False)
                 
-                # El HTML se envía como body directo - Odoo lo renderizará
+                # Asegurar que el HTML se envíe correctamente con etiqueta <p> al inicio
+                if '<div' in response or '<table' in response or '<style' in response:
+                    # Si contiene HTML, enviar como HTML
+                    html_response = f"<p>{response}</p>" if not response.startswith('<p') and not response.startswith('<div') else response
+                else:
+                    # Si es solo texto, envolver en párrafo
+                    html_response = f"<p>{response}</p>"
+                
                 channel.message_post(
-                    body=response,
+                    body=html_response,
                     message_type='comment',
                     subtype_xmlid='mail.mt_comment',
                     author_id=bot_partner.id if bot_partner else False,
