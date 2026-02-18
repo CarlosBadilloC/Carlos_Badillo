@@ -37,6 +37,9 @@ Módulo de integración de IA para control de inventario y CRM con soporte para 
         'web.assets_common': [
             'modulo/static/css/dashboard.css',
         ],
+        'web.assets_frontend': [
+            'modulo/static/js/livechat_a2ui.js',
+        ],
     },
     'installable': True,
     'auto_install': False,
