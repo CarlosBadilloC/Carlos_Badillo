@@ -20,93 +20,67 @@ class LivechatIntegration(models.Model):
 
     @api.model
     def _call_ai_agent(self, ai_agent, prompt):
-        """Llama al agente IA y obtiene respuesta ejecutando acciones directamente"""
+        """Llama al agente IA y obtiene respuesta con soporte A2UI"""
         try:
             prompt_lower = prompt.lower()
+            response = None
             
-            # 1. COTIZACIONES - Máxima prioridad
+            # 1. COTIZACIONES
             if re.search(r'cotizacion|cotización|presupuesto|quote', prompt_lower):
                 product_name = self._extract_product_from_prompt(prompt)
                 _logger.info(f"🔍 Detectado: Búsqueda de cotizaciones para '{product_name}'")
-                return self.env['ai.crm.actions'].search_quotations_with_stock(product_name)
+                response = self.env['ai.crm.actions'].search_quotations_with_stock(product_name)
             
             # 2. STOCK BAJO
-            elif re.search(r'stock\s+bajo|poco\s+stock|bajo\s+inventario|inventory\s+low', prompt_lower):
+            elif re.search(r'stock\s+bajo|poco\s+stock|bajo\s+inventario', prompt_lower):
                 _logger.info(f"🔍 Detectado: Stock bajo")
-                return self.env['ai.inventory.actions'].check_low_stock(threshold=10)
+                response = self.env['ai.inventory.actions'].check_low_stock(threshold=10)
             
             # 3. RESUMEN DE INVENTARIO
-            elif re.search(r'resumen\s+inventario|inventario\s+completo|estado\s+inventario|inventory\s+summary', prompt_lower):
+            elif re.search(r'resumen\s+inventario|inventario\s+completo|estado\s+inventario', prompt_lower):
                 _logger.info(f"🔍 Detectado: Resumen de inventario")
-                return self.env['ai.inventory.actions'].get_inventory_summary()
+                response = self.env['ai.inventory.actions'].get_inventory_summary()
             
-            # 4. BÚSQUEDA POR CATEGORÍA
-            elif re.search(r'categoría|categoria|categor|by\s+category', prompt_lower):
-                category_name = self._extract_category_from_prompt(prompt)
-                _logger.info(f"🔍 Detectado: Productos por categoría '{category_name}'")
-                return self.env['ai.inventory.actions'].search_product_by_category(category_name or 'All')
-            
-            # 5. CREAR OPORTUNIDAD
-            elif re.search(r'crear.*oportunidad|nueva.*oportunidad|create.*opportunity|new.*opportunity', prompt_lower):
-                opportunity_data = self._extract_opportunity_data(prompt)
-                _logger.info(f"🔍 Detectado: Crear oportunidad '{opportunity_data['name']}'")
-                return self.env['ai.crm.actions'].create_opportunity(
-                    name=opportunity_data['name'],
-                    customer_name=opportunity_data['customer_name'],
-                    email=opportunity_data['email'],
-                    phone=opportunity_data['phone'],
-                    stage_name=opportunity_data['stage_name'],
-                    expected_revenue=opportunity_data['expected_revenue']
-                )
-            
-            # 6. BÚSQUEDA POR ETAPA (CRM)
-            elif re.search(r'etapa\s+(qualified|proposition|won|new)|leads?\s+en\s+(qualified|proposition|won|new)', prompt_lower):
-                stage_name = self._extract_stage_from_prompt(prompt)
-                _logger.info(f"🔍 Detectado: Búsqueda por etapa '{stage_name}'")
-                return self.env['ai.crm.actions'].search_leads_by_stage(stage_name)
-            
-            # 7. RESUMEN DEL PIPELINE
-            elif re.search(r'pipeline|resumen\s+ventas|sales\s+summary|pipeline\s+summary', prompt_lower):
+            # 4. RESUMEN DEL PIPELINE
+            elif re.search(r'pipeline|resumen\s+ventas|sales\s+summary', prompt_lower):
                 _logger.info(f"🔍 Detectado: Resumen del pipeline")
-                return self.env['ai.crm.actions'].get_pipeline_summary()
+                response = self.env['ai.crm.actions'].get_pipeline_summary()
             
-            # 8. LISTAR OPORTUNIDADES
-            elif re.search(r'oportunidad|opportunity|lead', prompt_lower) and re.search(r'list|listar|mostrar|show|todas|abiertas|abierto', prompt_lower):
+            # 5. LISTAR OPORTUNIDADES
+            elif re.search(r'oportunidad|opportunity|lead', prompt_lower) and re.search(r'list|listar|mostrar|abiertas', prompt_lower):
                 _logger.info(f"🔍 Detectado: Listar oportunidades abiertas")
-                return self.env['ai.crm.actions'].list_open_opportunities(limit=10)
+                response = self.env['ai.crm.actions'].list_open_opportunities(limit=10)
             
-            # 9. INFORMACIÓN DE LEAD/OPORTUNIDAD ESPECÍFICA
-            elif re.search(r'información|info|detalles|details|dame|tell\s+me', prompt_lower) and re.search(r'lead|oportunidad|opportunity', prompt_lower):
-                lead_name = self._extract_lead_name_from_prompt(prompt)
-                _logger.info(f"🔍 Detectado: Información de lead/oportunidad '{lead_name}'")
-                return self.env['ai.crm.actions'].get_lead_info(lead_name)
-            
-            # 10. BÚSQUEDA DE PRODUCTOS
-            elif re.search(r'busco|search|productos|products|stock|inventario', prompt_lower):
+            # 6. BÚSQUEDA DE PRODUCTOS
+            elif re.search(r'busco|search|productos|products|stock', prompt_lower):
                 _logger.info(f"🔍 Detectado: Búsqueda general de productos")
-                return self.env['ai.inventory.actions'].search_products_detailed(prompt)
+                response = self.env['ai.inventory.actions'].search_products_detailed(prompt)
             
-            else:
-                _logger.info(f"🔍 No se detectó intención clara, mostrando menú de ayuda")
-                return (
-                    "👋 Hola, soy tu asistente de IA. Puedo ayudarte con:\n\n"
-                    "📦 **Inventario:**\n"
-                    "  • Consultar stock de productos (ej: 'stock de desks')\n"
-                    "  • Ver productos por categoría (ej: 'productos de la categoría muebles')\n"
-                    "  • Resumen del inventario (ej: 'resumen de inventario')\n"
-                    "  • Detectar stock bajo (ej: '¿hay productos con stock bajo?')\n\n"
-                    "💼 **CRM:**\n"
-                    "  • Listar oportunidades abiertas (ej: 'muéstrame las oportunidades')\n"
-                    "  • Buscar leads por etapa (ej: 'leads en qualified')\n"
-                    "  • Ver resumen del pipeline (ej: 'resumen del pipeline')\n"
-                    "  • Crear nuevas oportunidades (ej: 'crear oportunidad para cliente X')\n"
-                    "  • Consultar cotizaciones (ej: 'cotizaciones de pelotas')\n\n"
-                    "¿En qué puedo ayudarte?"
-                )
+            # Formatear respuesta A2UI si es un diccionario
+            if isinstance(response, dict) and 'a2ui_dashboard' in response:
+                return self._format_a2ui_response(response)
+            
+            return response or self._get_help_menu()
                 
         except Exception as e:
             _logger.error(f"❌ Error llamando agente IA: {e}", exc_info=True)
             return f"❌ Disculpa, ocurrió un error: {str(e)}"
+        
+    @api.model
+    def _format_a2ui_response(self, response_dict):
+        """Formatea respuesta con protocolo A2UI para livechat"""
+        text = response_dict.get('text', '')
+        dashboard = response_dict.get('a2ui_dashboard', {})
+        
+        # Crear marcador A2UI especial que el cliente entenderá
+        a2ui_json = {
+            'type': 'dashboard',
+            'data': dashboard
+        }
+        
+        # Formato compatible con Odoo Livechat A2UI
+        formatted = f"{text}\n\n<a2ui>{json.dumps(a2ui_json)}</a2ui>"
+        return formatted
 
     @api.model
     def _extract_product_from_prompt(self, prompt):

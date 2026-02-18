@@ -34,7 +34,7 @@ class AICrmActions(models.AbstractModel):
 
     @api.model
     def list_open_opportunities(self, limit=10):
-        """Lista oportunidades abiertas"""
+        """Lista oportunidades abiertas con dashboard A2UI"""
         opportunities = self.env['crm.lead'].sudo().search([
             ('type', '=', 'opportunity'),
             ('active', '=', True),
@@ -44,14 +44,52 @@ class AICrmActions(models.AbstractModel):
         if not opportunities:
             return "✅ No hay oportunidades abiertas."
 
-        result = ["📌 Oportunidades abiertas:"]
+        rows = []
+        total_revenue = 0
         for o in opportunities:
             stage = o.stage_id.name if o.stage_id else "Sin etapa"
-            result.append(
-                f"  • {o.name} ({stage}) - {o.probability}% - ${o.expected_revenue:,.2f}"
-            )
+            customer = o.partner_id.display_name if o.partner_id else "Sin cliente"
+            total_revenue += o.expected_revenue
+            
+            rows.append({
+                'name': o.name,
+                'customer': customer,
+                'stage': stage,
+                'probability': f"{o.probability}%",
+                'revenue': f"${o.expected_revenue:,.2f}",
+                'weighted': f"${o.expected_revenue * o.probability / 100:,.2f}"
+            })
 
-        return "\n".join(result)
+        response = {
+            'text': f"📌 {len(opportunities)} Oportunidades Abiertas",
+            'a2ui_dashboard': {
+                'type': 'opportunities',
+                'cards': [
+                    {
+                        'title': 'Total Oportunidades',
+                        'value': len(opportunities),
+                        'icon': '🎯',
+                        'color': 'primary'
+                    },
+                    {
+                        'title': 'Ingresos Totales',
+                        'value': f"${total_revenue:,.2f}",
+                        'icon': '💰',
+                        'color': 'success'
+                    }
+                ],
+                'columns': [
+                    {'key': 'name', 'label': 'Oportunidad'},
+                    {'key': 'customer', 'label': 'Cliente'},
+                    {'key': 'stage', 'label': 'Etapa'},
+                    {'key': 'probability', 'label': 'Probabilidad'},
+                    {'key': 'revenue', 'label': 'Ingresos'},
+                    {'key': 'weighted', 'label': 'Ponderado'}
+                ],
+                'rows': rows
+            }
+        }
+        return response
 
     @api.model
     def create_opportunity(self, name, customer_name=None, email=None, phone=None, stage_name=None, expected_revenue=0.0):
@@ -106,7 +144,7 @@ class AICrmActions(models.AbstractModel):
 
     @api.model
     def get_pipeline_summary(self):
-        """Resumen del pipeline por etapa (compatible Odoo 19)"""
+        """Resumen del pipeline por etapa con dashboard A2UI"""
         opportunities = self.env['crm.lead'].sudo().search([
             ('type', '=', 'opportunity'),
             ('active', '=', True),
@@ -119,15 +157,56 @@ class AICrmActions(models.AbstractModel):
         for opp in opportunities:
             stage_name = opp.stage_id.name if opp.stage_id else "Sin etapa"
             if stage_name not in stage_data:
-                stage_data[stage_name] = {'count': 0, 'revenue': 0.0}
+                stage_data[stage_name] = {'count': 0, 'revenue': 0.0, 'opportunities': []}
             stage_data[stage_name]['count'] += 1
             stage_data[stage_name]['revenue'] += opp.expected_revenue
+            stage_data[stage_name]['opportunities'].append(opp)
 
-        result = ["📊 Resumen del pipeline por etapa:"]
+        stage_rows = []
+        total_revenue = 0
         for stage, data in stage_data.items():
-            result.append(f"  • {stage}: {data['count']} oportunidades - ${data['revenue']:,.2f}")
+            total_revenue += data['revenue']
+            stage_rows.append({
+                'stage': stage,
+                'count': data['count'],
+                'revenue': f"${data['revenue']:,.2f}",
+                'avg_deal': f"${data['revenue']/data['count']:,.2f}" if data['count'] > 0 else "$0.00"
+            })
 
-        return "\n".join(result)
+        response = {
+            'text': '📊 Resumen del Pipeline CRM',
+            'a2ui_dashboard': {
+                'type': 'pipeline',
+                'cards': [
+                    {
+                        'title': 'Total Oportunidades',
+                        'value': len(opportunities),
+                        'icon': '🎯',
+                        'color': 'primary'
+                    },
+                    {
+                        'title': 'Ingresos Proyectados',
+                        'value': f"${total_revenue:,.2f}",
+                        'icon': '💰',
+                        'color': 'success'
+                    },
+                    {
+                        'title': 'Ingreso Promedio',
+                        'value': f"${total_revenue/len(opportunities):,.2f}" if opportunities else "$0.00",
+                        'icon': '📈',
+                        'color': 'info'
+                    }
+                ],
+                'stages': stage_rows,
+                'columns': [
+                    {'key': 'stage', 'label': 'Etapa'},
+                    {'key': 'count', 'label': 'Cantidad'},
+                    {'key': 'revenue', 'label': 'Ingresos'},
+                    {'key': 'avg_deal', 'label': 'Promedio'}
+                ]
+            }
+        }
+        return response
 
     @api.model
     def search_leads_by_stage(self, stage_name):
