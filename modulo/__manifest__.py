@@ -32,6 +32,11 @@ Módulo de integración de IA para control de inventario y CRM con soporte para 
     'demo': [
         'demo/demo.xml',
     ],
+    'assets': {
+        'web.assets_common': [
+            'modulo/static/src/css/dashboard.css',
+        ],
+    },
     'installable': True,
     'auto_install': False,
     'license': 'LGPL-3',

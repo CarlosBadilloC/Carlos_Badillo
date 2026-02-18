@@ -107,19 +107,335 @@ class LivechatIntegration(models.Model):
         
     @api.model
     def _format_a2ui_response(self, response_dict):
-        """Formatea respuesta con protocolo A2UI para livechat"""
+        """Formatea respuesta con protocolo A2UI para livechat - genera HTML directo"""
         text = response_dict.get('text', '')
         dashboard = response_dict.get('a2ui_dashboard', {})
         
-        # Crear marcador A2UI especial que el cliente entenderá
-        a2ui_json = {
-            'type': 'dashboard',
-            'data': dashboard
+        # Generar HTML para renderizar en el chat
+        html = self._generate_dashboard_html(dashboard)
+        
+        # Retornar texto + HTML que Livechat renderizará
+        return f"{text}\n{html}"
+    
+    @api.model
+    def _generate_dashboard_html(self, dashboard):
+        """Genera HTML directo para los dashboards"""
+        dashboard_type = dashboard.get('type', '')
+        
+        if dashboard_type == 'table':
+            return self._html_table_dashboard(dashboard)
+        elif dashboard_type == 'summary_cards':
+            return self._html_summary_cards(dashboard)
+        elif dashboard_type == 'pipeline':
+            return self._html_pipeline_dashboard(dashboard)
+        elif dashboard_type == 'opportunities':
+            return self._html_opportunities_dashboard(dashboard)
+        elif dashboard_type == 'alert_table':
+            return self._html_alert_table(dashboard)
+        elif dashboard_type == 'help_menu':
+            return self._html_help_menu(dashboard)
+        
+        return ""
+    
+    @api.model
+    def _html_table_dashboard(self, dashboard):
+        """Genera HTML para tabla de productos"""
+        title = dashboard.get('title', 'Productos')
+        columns = dashboard.get('columns', [])
+        rows = dashboard.get('rows', [])
+        
+        html = f"""
+        <div style="margin-top: 15px; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+            <h3 style="padding: 15px; background: #f8f9fa; margin: 0; color: #333; font-size: 16px; border-bottom: 1px solid #ddd;">{title}</h3>
+            <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+                <thead>
+                    <tr style="background: #f8f9fa; border-bottom: 2px solid #ddd;">
+        """
+        
+        for col in columns:
+            html += f"<th style='padding: 12px; text-align: left; color: #666; font-weight: 600;'>{col['label']}</th>"
+        
+        html += """
+                    </tr>
+                </thead>
+                <tbody>
+        """
+        
+        for row in rows:
+            html += "<tr style='border-bottom: 1px solid #eee;'>"
+            for col in columns:
+                value = row.get(col['key'], '')
+                html += f"<td style='padding: 12px; color: #333;'>{value}</td>"
+            html += "</tr>"
+        
+        html += """
+                </tbody>
+            </table>
+        </div>
+        """
+        return html
+    
+    @api.model
+    def _html_summary_cards(self, dashboard):
+        """Genera HTML para tarjetas resumen"""
+        cards = dashboard.get('cards', [])
+        table_data = dashboard.get('table', {})
+        
+        colors = {
+            'primary': '#0066cc',
+            'success': '#28a745',
+            'info': '#17a2b8',
+            'warning': '#ffc107'
         }
         
-        # Formato compatible con Odoo Livechat A2UI
-        formatted = f"{text}\n\n<a2ui>{json.dumps(a2ui_json)}</a2ui>"
-        return formatted
+        html = "<div style='display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 15px;'>"
+        
+        for card in cards:
+            color = colors.get(card.get('color', 'primary'), '#0066cc')
+            icon = card.get('icon', '📊')
+            title = card.get('title', '')
+            value = card.get('value', '')
+            subtitle = card.get('subtitle', '')
+            
+            html += f"""
+            <div style="background: {color}; color: white; padding: 20px; border-radius: 8px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                <div style="font-size: 32px; margin-bottom: 10px;">{icon}</div>
+                <div style="font-size: 14px; opacity: 0.9; margin-bottom: 8px;">{title}</div>
+                <div style="font-size: 24px; font-weight: bold; margin: 10px 0;">{value}</div>
+                {f'<div style="font-size: 12px; opacity: 0.8;">{subtitle}</div>' if subtitle else ''}
+            </div>
+            """
+        
+        html += "</div>"
+        
+        # Agregar tabla si existe
+        if table_data:
+            columns = table_data.get('columns', [])
+            rows = table_data.get('rows', [])
+            title = table_data.get('title', '')
+            
+            html += f"""
+            <div style="margin-top: 15px; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                <h4 style="padding: 12px 15px; background: #f8f9fa; margin: 0; color: #333; border-bottom: 1px solid #ddd;">{title}</h4>
+                <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+                    <thead>
+                        <tr style="background: #f8f9fa; border-bottom: 2px solid #ddd;">
+            """
+            
+            for col in columns:
+                html += f"<th style='padding: 10px 12px; text-align: left; color: #666; font-weight: 600;'>{col['label']}</th>"
+            
+            html += """
+                        </tr>
+                    </thead>
+                    <tbody>
+            """
+            
+            for row in rows:
+                html += "<tr style='border-bottom: 1px solid #eee;'>"
+                for col in columns:
+                    value = row.get(col['key'], '')
+                    html += f"<td style='padding: 10px 12px; color: #333;'>{value}</td>"
+                html += "</tr>"
+            
+            html += """
+                    </tbody>
+                </table>
+            </div>
+            """
+        
+        return html
+    
+    @api.model
+    def _html_alert_table(self, dashboard):
+        """Genera HTML para tabla de alertas"""
+        title = dashboard.get('title', 'Alertas')
+        columns = dashboard.get('columns', [])
+        rows = dashboard.get('rows', [])
+        summary = dashboard.get('summary', {})
+        
+        html = f"""
+        <div style="margin-top: 15px; background: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; border-radius: 8px;">
+            <div style="color: #856404; font-weight: bold; margin-bottom: 15px;">⚠️ {title}</div>
+            
+            <div style="background: white; border-radius: 6px; overflow: hidden; margin-bottom: 15px;">
+                <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+                    <thead>
+                        <tr style="background: #f8f9fa; border-bottom: 2px solid #ddd;">
+        """
+        
+        for col in columns:
+            html += f"<th style='padding: 10px 12px; text-align: left; color: #666; font-weight: 600;'>{col['label']}</th>"
+        
+        html += """
+                        </tr>
+                    </thead>
+                    <tbody>
+        """
+        
+        for row in rows:
+            html += "<tr style='border-bottom: 1px solid #eee;'>"
+            for col in columns:
+                value = row.get(col['key'], '')
+                html += f"<td style='padding: 10px 12px; color: #333;'>{value}</td>"
+            html += "</tr>"
+        
+        html += f"""
+                    </tbody>
+                </table>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px;">
+                <div style="background: white; padding: 10px; border-radius: 6px;">
+                    <div style="color: #666; font-size: 12px;">Total Productos</div>
+                    <div style="font-size: 18px; font-weight: bold; color: #333;">{summary.get('total_products', 0)}</div>
+                </div>
+                <div style="background: white; padding: 10px; border-radius: 6px;">
+                    <div style="color: #666; font-size: 12px;">Valor a Reabastecer</div>
+                    <div style="font-size: 18px; font-weight: bold; color: #d9534f;">{summary.get('restock_value', '$0.00')}</div>
+                </div>
+            </div>
+        </div>
+        """
+        return html
+    
+    @api.model
+    def _html_opportunities_dashboard(self, dashboard):
+        """Genera HTML para oportunidades"""
+        cards = dashboard.get('cards', [])
+        columns = dashboard.get('columns', [])
+        rows = dashboard.get('rows', [])
+        
+        colors = {'primary': '#0066cc', 'success': '#28a745'}
+        
+        html = "<div style='display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-top: 15px;'>"
+        
+        for card in cards:
+            color = colors.get(card.get('color', 'primary'), '#0066cc')
+            html += f"""
+            <div style="background: {color}; color: white; padding: 15px; border-radius: 8px; text-align: center;">
+                <div style="font-size: 28px; margin-bottom: 8px;">{card.get('icon', '🎯')}</div>
+                <div style="font-size: 12px; opacity: 0.9;">{card.get('title', '')}</div>
+                <div style="font-size: 20px; font-weight: bold; margin: 8px 0;">{card.get('value', '')}</div>
+            </div>
+            """
+        
+        html += """
+        </div>
+        <div style="margin-top: 15px; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <thead>
+                    <tr style="background: #f8f9fa; border-bottom: 2px solid #ddd;">
+        """
+        
+        for col in columns:
+            html += f"<th style='padding: 10px 12px; text-align: left; color: #666; font-weight: 600;'>{col['label']}</th>"
+        
+        html += """
+                    </tr>
+                </thead>
+                <tbody>
+        """
+        
+        for row in rows:
+            html += "<tr style='border-bottom: 1px solid #eee;'>"
+            for col in columns:
+                value = row.get(col['key'], '')
+                html += f"<td style='padding: 10px 12px; color: #333;'>{value}</td>"
+            html += "</tr>"
+        
+        html += """
+                </tbody>
+            </table>
+        </div>
+        """
+        return html
+    
+    @api.model
+    def _html_pipeline_dashboard(self, dashboard):
+        """Genera HTML para pipeline"""
+        cards = dashboard.get('cards', [])
+        stages = dashboard.get('stages', [])
+        
+        colors = {'primary': '#0066cc', 'success': '#28a745', 'info': '#17a2b8'}
+        
+        html = "<div style='display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-top: 15px;'>"
+        
+        for card in cards:
+            color = colors.get(card.get('color', 'primary'), '#0066cc')
+            html += f"""
+            <div style="background: {color}; color: white; padding: 15px; border-radius: 8px; text-align: center;">
+                <div style="font-size: 28px; margin-bottom: 8px;">{card.get('icon', '📊')}</div>
+                <div style="font-size: 12px; opacity: 0.9;">{card.get('title', '')}</div>
+                <div style="font-size: 20px; font-weight: bold; margin: 8px 0;">{card.get('value', '')}</div>
+            </div>
+            """
+        
+        html += """
+        </div>
+        <div style="margin-top: 15px;">
+            <h4 style="color: #333; margin-bottom: 12px;">Pipeline por Etapa</h4>
+            <div style="background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                    <thead>
+                        <tr style="background: #f8f9fa; border-bottom: 2px solid #ddd;">
+                            <th style='padding: 10px 12px; text-align: left; color: #666; font-weight: 600;'>Etapa</th>
+                            <th style='padding: 10px 12px; text-align: left; color: #666; font-weight: 600;'>Cantidad</th>
+                            <th style='padding: 10px 12px; text-align: left; color: #666; font-weight: 600;'>Ingresos</th>
+                            <th style='padding: 10px 12px; text-align: left; color: #666; font-weight: 600;'>Promedio</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+        """
+        
+        for stage in stages:
+            html += f"""
+                        <tr style='border-bottom: 1px solid #eee;'>
+                            <td style='padding: 10px 12px; color: #333;'>{stage.get('stage', '')}</td>
+                            <td style='padding: 10px 12px; color: #333;'>{stage.get('count', 0)}</td>
+                            <td style='padding: 10px 12px; color: #28a745; font-weight: bold;'>{stage.get('revenue', '$0.00')}</td>
+                            <td style='padding: 10px 12px; color: #333;'>{stage.get('avg_deal', '$0.00')}</td>
+                        </tr>
+            """
+        
+        html += """
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        """
+        return html
+    
+    @api.model
+    def _html_help_menu(self, dashboard):
+        """Genera HTML para menú de ayuda"""
+        options = dashboard.get('options', [])
+        message = dashboard.get('message', '')
+        
+        html = """
+        <div style="margin-top: 15px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 8px;">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 15px;">
+        """
+        
+        for option in options:
+            keywords = ', '.join(option.get('keywords', []))
+            html += f"""
+                <div style="background: rgba(255, 255, 255, 0.15); padding: 12px; border-radius: 6px; border: 1px solid rgba(255, 255, 255, 0.3);">
+                    <div style="font-size: 24px; margin-bottom: 8px;">{option.get('icon', '📦')}</div>
+                    <div style="font-weight: bold; font-size: 13px; margin-bottom: 4px;">{option.get('title', '')}</div>
+                    <div style="font-size: 11px; margin-bottom: 6px; opacity: 0.9;">{option.get('description', '')}</div>
+                    <div style="font-size: 10px; opacity: 0.8;">{keywords}</div>
+                </div>
+            """
+        
+        html += f"""
+            </div>
+            <div style="background: rgba(0, 0, 0, 0.1); padding: 12px; border-radius: 6px; font-size: 12px; line-height: 1.5; border-left: 3px solid rgba(255, 255, 255, 0.5);">
+                {message}
+            </div>
+        </div>
+        """
+        return html
 
     @api.model
     def _extract_product_from_prompt(self, prompt):

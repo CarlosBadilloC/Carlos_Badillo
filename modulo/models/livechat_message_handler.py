@@ -61,11 +61,14 @@ class MailMessage(models.Model):
             if response:
                 # Enviar respuesta del bot automáticamente
                 bot_partner = self.env.ref('base.partner_root', raise_if_not_found=False)
+                
+                # El HTML se envía como body directo - Odoo lo renderizará
                 channel.message_post(
                     body=response,
                     message_type='comment',
                     subtype_xmlid='mail.mt_comment',
-                    author_id=bot_partner.id if bot_partner else False
+                    author_id=bot_partner.id if bot_partner else False,
+                    email_from=bot_partner.email if bot_partner else None
                 )
                 
                 _logger.info(f"✅ Respuesta IA enviada al canal {channel.name}")
